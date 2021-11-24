@@ -8,8 +8,11 @@ cnv.height = 600;
 
 // Global variables
 let shipX = 100;
+let shipY = 500;
 let rightIsPressed = false;
 let leftIsPressed = false;
+let upIsPressed = false;
+let jumping = false;
 
 // Event listeners
 document.addEventListener("keydown", keydownHandler);
@@ -22,6 +25,9 @@ function keydownHandler() {
   if (event.code == "KeyA" || event.code == "ArrowLeft") {
     leftIsPressed = true;
   }
+  if (event.code == "KeyW" || event.code == "ArrowUp" || event.code == "Space") {
+    upIsPressed = true;
+  }
 }
 
 function keyupHandler() {
@@ -30,6 +36,10 @@ function keyupHandler() {
   }
   if (event.code == "KeyA" || event.code == "ArrowLeft") {
     leftIsPressed = false;
+  }
+  if (event.code == "KeyW" || event.code == "ArrowUp" || event.code == "Space") {
+    upIsPressed = false;
+    jumping = false;
   }
 }
 
@@ -46,7 +56,7 @@ function loop() {
   // SHIP
 
   ctx.fillStyle = "black";
-  ctx.fillRect(50, 50, 25, 25);
+  ctx.fillRect(shipX, shipY, 25, 25);
 
   // move
   if (rightIsPressed) {
@@ -54,12 +64,18 @@ function loop() {
   } else if (leftIsPressed) {
     shipX -= 5;
   }
+  if (upIsPressed) {
+    shipY -= 5;
+    jumping = true;
+  }
 
   // prevent ship from going off screen
-  if (shipX < -15) {
-    shipX = cnv.width;
+  if (shipX < 0) {
+    shipX = 0;
   }
-  if (shipX > cnv.width) {
-    shipX = -15;
+  if (shipX > cnv.width - 25) {
+    shipX = cnv.width - 25;
   }
+
+  requestAnimationFrame(loop);
 }
