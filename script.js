@@ -7,16 +7,18 @@ cnv.width = 1000;
 cnv.height = 600;
 
 // Global variables
-let shipX = 100;
-let shipY = 500;
+let screen = "title";
+let charX = 100;
+let charY = 100;
 let rightIsPressed = false;
 let leftIsPressed = false;
-let upIsPressed = false;
 let jumping = false;
+let gravity = 0;
 
 // Event listeners
 document.addEventListener("keydown", keydownHandler);
 document.addEventListener("keyup", keyupHandler);
+document.addEventListener("click", startGame);
 
 function keydownHandler() {
   if (event.code == "KeyD" || event.code == "ArrowRight") {
@@ -25,8 +27,14 @@ function keydownHandler() {
   if (event.code == "KeyA" || event.code == "ArrowLeft") {
     leftIsPressed = true;
   }
-  if (event.code == "KeyW" || event.code == "ArrowUp" || event.code == "Space") {
-    upIsPressed = true;
+  if (
+    event.code == "KeyW" ||
+    event.code == "ArrowUp" ||
+    event.code == "Space"
+  ) {
+    if (!jumping) {
+      jumping = "start";
+    }
   }
 }
 
@@ -37,45 +45,81 @@ function keyupHandler() {
   if (event.code == "KeyA" || event.code == "ArrowLeft") {
     leftIsPressed = false;
   }
-  if (event.code == "KeyW" || event.code == "ArrowUp" || event.code == "Space") {
-    upIsPressed = false;
-    jumping = false;
-  }
+}
+
+function startGame() {
+  screen = "levelSelect";
 }
 
 // Main Program Loop (60 FPS)
 requestAnimationFrame(loop);
 
 function loop() {
-  // console.log()
+  // console.log();
 
-  // BACKGROUND
-  ctx.fillStyle = "white";
-  ctx.fillRect(0, 0, cnv.width, cnv.height);
+  if (screen == "title") {
+    
+  } else if (screen == "levelSelect") {
 
-  // SHIP
+  } else {
+    // BACKGROUND
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, cnv.width, cnv.height);
 
-  ctx.fillStyle = "black";
-  ctx.fillRect(shipX, shipY, 25, 25);
+    // FLOOR
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "black";
+    ctx.beginPath();
+    ctx.moveTo(0, 538);
+    ctx.lineTo(cnv.width, 538);
+    ctx.stroke();
 
-  // move
-  if (rightIsPressed) {
-    shipX += 5;
-  } else if (leftIsPressed) {
-    shipX -= 5;
+    
+
+    // Character
+    ctx.fillStyle = "black";
+    ctx.fillRect(charX, charY, 25, 25);
+
+    // move x
+    if (rightIsPressed) {
+      charX += 5;
+    } else if (leftIsPressed) {
+      charX -= 5;
+    }
+
+    // jump
+    if (jumping === "start") {
+      jumping = true;
+      gravity = -13;
+    }
+    charY += gravity;
+    if (jumping) {
+      gravity += 0.5;
+    }
+    if (charY > 500) {
+      gravity = 0;
+      jumping = false;
+    } else if (!jumping) {
+      gravity = 10;
+    }
+
+    // prevent character from going off screen
+    if (charX < 0) {
+      charX = 0;
+    }
+    if (charX > cnv.width - 25) {
+      charX = cnv.width - 25;
+    }
+
+    // LEVEL 1: Route de la Soie
+
+    // LEVEL 2: First Nations
+
+    // LEVEL 3: Europeans
+
+    // LEVEL 4: Industrialisation in UK
+
+    // LEVEL 5: Child Labour
   }
-  if (upIsPressed) {
-    shipY -= 5;
-    jumping = true;
-  }
-
-  // prevent ship from going off screen
-  if (shipX < 0) {
-    shipX = 0;
-  }
-  if (shipX > cnv.width - 25) {
-    shipX = cnv.width - 25;
-  }
-
   requestAnimationFrame(loop);
 }
