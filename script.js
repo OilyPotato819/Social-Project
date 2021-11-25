@@ -47,8 +47,22 @@ function keyupHandler() {
   }
 }
 
-function startGame() {
-  screen = "levelSelect";
+function startGame(event) {
+  let cnvRect = cnv.getBoundingClientRect();
+  mouseX = event.x - cnvRect.x;
+  mouseY = event.y - cnvRect.y;
+
+  let run = mouseX - 500;
+  let rise = 300 - mouseY;
+  let distance = Math.sqrt(run ** 2 + rise ** 2);
+  if (distance < 30) {
+    screen = "levelSelect";
+    document.addEventListener("click", level1);
+  }
+}
+
+function level1() {
+  screen = "level1"
 }
 
 // Main Program Loop (60 FPS)
@@ -58,9 +72,13 @@ function loop() {
   // console.log();
 
   if (screen == "title") {
-    
+    ctx.fillStyle = "green";
+    ctx.beginPath();
+    ctx.arc(500, 300, 30, 0, 2 * Math.PI);
+    ctx.fill();
   } else if (screen == "levelSelect") {
-
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, cnv.width, cnv.height);
   } else {
     // BACKGROUND
     ctx.fillStyle = "white";
@@ -74,7 +92,7 @@ function loop() {
     ctx.lineTo(cnv.width, 538);
     ctx.stroke();
 
-    
+
 
     // Character
     ctx.fillStyle = "black";
