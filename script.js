@@ -14,23 +14,26 @@ let rightIsPressed = false;
 let leftIsPressed = false;
 let jumping = false;
 let gravity = 0;
+let cnvRect = cnv.getBoundingClientRect();
+let distance;
 
 // Event listeners
 document.addEventListener("keydown", keydownHandler);
 document.addEventListener("keyup", keyupHandler);
 document.addEventListener("click", startGame);
+document.addEventListener("mousemove", mousemoveHandler);
 
-function keydownHandler() {
-  if (event.code == "KeyD" || event.code == "ArrowRight") {
+function keydownHandler(event) {
+  if (event.code === "KeyD" || event.code === "ArrowRight") {
     rightIsPressed = true;
   }
-  if (event.code == "KeyA" || event.code == "ArrowLeft") {
+  if (event.code === "KeyA" || event.code === "ArrowLeft") {
     leftIsPressed = true;
   }
   if (
-    event.code == "KeyW" ||
-    event.code == "ArrowUp" ||
-    event.code == "Space"
+    event.code === "KeyW" ||
+    event.code === "ArrowUp" ||
+    event.code === "Space"
   ) {
     if (!jumping) {
       jumping = "start";
@@ -38,31 +41,31 @@ function keydownHandler() {
   }
 }
 
-function keyupHandler() {
-  if (event.code == "KeyD" || event.code == "ArrowRight") {
+function keyupHandler(event) {
+  if (event.code === "KeyD" || event.code === "ArrowRight") {
     rightIsPressed = false;
   }
-  if (event.code == "KeyA" || event.code == "ArrowLeft") {
+  if (event.code === "KeyA" || event.code === "ArrowLeft") {
     leftIsPressed = false;
   }
 }
 
-function startGame(event) {
-  let cnvRect = cnv.getBoundingClientRect();
-  mouseX = event.x - cnvRect.x;
-  mouseY = event.y - cnvRect.y;
-
-  let run = mouseX - 500;
-  let rise = 300 - mouseY;
-  let distance = Math.sqrt(run ** 2 + rise ** 2);
+function startGame() {
   if (distance < 30) {
-    screen = "levelSelect";
-    document.addEventListener("click", level1);
+    screen = "level1";
   }
 }
 
-function level1() {
-  screen = "level1"
+function mousemoveHandler(event) {
+  let run = Math.abs(event.x - cnvRect.x - 500);
+  let rise = Math.abs(event.y - cnvRect.y - 300);
+  distance = Math.sqrt(run ** 2 + rise ** 2);
+
+  if (distance < 30) {
+    document.body.style.cursor = "pointer";
+  } else {
+    document.body.style.cursor = "default";
+  }
 }
 
 // Main Program Loop (60 FPS)
@@ -71,14 +74,10 @@ requestAnimationFrame(loop);
 function loop() {
   // console.log();
 
-  if (screen == "title") {
-    ctx.fillStyle = "green";
-    ctx.beginPath();
+  if (screen === "title") {
+    ctx.fillStyle = "black";
     ctx.arc(500, 300, 30, 0, 2 * Math.PI);
     ctx.fill();
-  } else if (screen == "levelSelect") {
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, cnv.width, cnv.height);
   } else {
     // BACKGROUND
     ctx.fillStyle = "white";
@@ -92,9 +91,7 @@ function loop() {
     ctx.lineTo(cnv.width, 538);
     ctx.stroke();
 
-
-
-    // Character
+    // CHARACTER
     ctx.fillStyle = "black";
     ctx.fillRect(charX, charY, 25, 25);
 
@@ -108,7 +105,7 @@ function loop() {
     // jump
     if (jumping === "start") {
       jumping = true;
-      gravity = -13;
+      gravity = -10;
     }
     charY += gravity;
     if (jumping) {
@@ -130,14 +127,29 @@ function loop() {
     }
 
     // LEVEL 1: Route de la Soie
+    // if (screen === "level1") {
+
+    // }
 
     // LEVEL 2: First Nations
+    // if (screen === "level2") {
+
+    // }
 
     // LEVEL 3: Europeans
+    // if (screen === "level3") {
+
+    // }
 
     // LEVEL 4: Industrialisation in UK
+    // if (screen === "level4") {
+
+    // }
 
     // LEVEL 5: Child Labour
+    // if (screen === "level15") {
+
+    // }
   }
   requestAnimationFrame(loop);
 }
