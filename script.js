@@ -153,3 +153,15 @@ function loop() {
   }
   requestAnimationFrame(loop);
 }
+
+// Xander code
+
+// function click(event) {
+//   let mouseX = event.x - cnvRect.x;
+//   let mouseY = event.y - cnvRect.y;
+//   let run = Math.abs(mouseX - target1X || mouseX - target2X || mouseX - target3X);
+//   let rise = Math.abs(mouseY - target1Y || mouseY - target2Y || mouseY - target3Y);
+//   let distance = Math.sqrt(run ** 2 + rise ** 2);
+// }
+
+// https://www.w3schools.com/cssref/pr_class_cursor.asp
