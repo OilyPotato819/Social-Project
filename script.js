@@ -13,8 +13,11 @@ let charY = 100;
 let rightIsPressed = false;
 let leftIsPressed = false;
 let jumping = false;
+let eIsPressed = false;
 let gravity = 0;
 let distance;
+let laserX, laserY, shootLaser;
+let laserTimer = 0;
 
 // Event listeners
 document.addEventListener("keydown", keydownHandler);
@@ -41,7 +44,6 @@ function mousemoveHandler(event) {
   }
 }
 
-
 function keydownHandler(event) {
   if (event.code === "KeyD" || event.code === "ArrowRight") {
     rightIsPressed = true;
@@ -50,13 +52,15 @@ function keydownHandler(event) {
     leftIsPressed = true;
   }
   if (
-    event.code === "KeyW" ||
-    event.code === "ArrowUp" ||
-    event.code === "Space"
+    (event.code === "KeyW" ||
+      event.code === "ArrowUp" ||
+      event.code === "Space") &&
+    !jumping
   ) {
-    if (!jumping) {
-      jumping = "start";
-    }
+    jumping = "start";
+  }
+  if (event.code === "KeyE") {
+    eIsPressed = true;
   }
 }
 
@@ -67,28 +71,55 @@ function keyupHandler(event) {
   if (event.code === "KeyA" || event.code === "ArrowLeft") {
     leftIsPressed = false;
   }
+  if (event.code === "KeyE") {
+    eIsPressed = false;
+  }
 }
 
 // Main Program Loop (60 FPS)
 requestAnimationFrame(loop);
 
 function loop() {
+  console.log(shootLaser);
   if (screen === "title") {
     ctx.fillStyle = "black";
     ctx.arc(500, 300, 30, 0, 2 * Math.PI);
     ctx.fill();
   } else {
-    // BACKGROUND
+    // BACKGROUNDS
+    // Start
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, cnv.width, cnv.height);
 
-    // FLOOR
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "black";
-    ctx.beginPath();
-    ctx.moveTo(0, 538);
-    ctx.lineTo(cnv.width, 538);
-    ctx.stroke();
+    // LEVEL 1: Route de la Soie
+    if (screen === "level1") {
+      // Backgroud
+      ctx.fillStyle = "#82E331";
+      ctx.fillRect(0, 504, cnv.width, 100);
+
+      ctx.fillStyle = "#33CAFF";
+      ctx.fillRect(0, 0, cnv.width, 504);
+    }
+
+    // LEVEL 2: First Nations
+    // if (screen === "level2") {
+
+    // }
+
+    // LEVEL 3: Europeans
+    // if (screen === "level3") {
+
+    // }
+
+    // LEVEL 4: Industrialisation in UK
+    // if (screen === "level4") {
+
+    // }
+
+    // LEVEL 5: Child Labour
+    // if (screen === "level15") {
+
+    // }
 
     // CHARACTER
     ctx.fillStyle = "black";
@@ -110,7 +141,7 @@ function loop() {
     if (jumping) {
       gravity += 0.5;
     }
-    if (charY > 500) {
+    if (charY > 470) {
       gravity = 0;
       jumping = false;
     } else if (!jumping) {
@@ -124,30 +155,32 @@ function loop() {
       charX = cnv.width - 25;
     }
 
-    // LEVEL 1: Route de la Soie
-    // if (screen === "level1") {
-
-    // }
-
-    // LEVEL 2: First Nations
-    // if (screen === "level2") {
-
-    // }
-
-    // LEVEL 3: Europeans
-    // if (screen === "level3") {
-
-    // }
-
-    // LEVEL 4: Industrialisation in UK
-    // if (screen === "level4") {
-
-    // }
-
-    // LEVEL 5: Child Labour
-    // if (screen === "level15") {
-
-    // }
+    // Shoot laser
+    if (eIsPressed && !shootLaser) {
+      shootLaser = "start";
+    }
+    if (shootLaser === "start") {
+      shootLaser = true;
+      laserTimer = 0;
+      laserX = charX;
+      laserY = charY;
+    }
+    if (shootLaser) {
+      laserTimer++;
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "red";
+      ctx.beginPath();
+      ctx.moveTo(laserX, laserY);
+      ctx.lineTo(700, 150);
+      ctx.stroke();
+    }
+    if (laserTimer > 10) {
+      shootLaser = "cooldown";
+    }
+    if (laserTimer > 20) {
+      shootLaser = false;
+      laserTimer = 0;
+    }
   }
   requestAnimationFrame(loop);
 }
