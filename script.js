@@ -14,7 +14,6 @@ let rightIsPressed = false;
 let leftIsPressed = false;
 let jumping = false;
 let gravity = 0;
-let cnvRect = cnv.getBoundingClientRect();
 let distance;
 
 // Event listeners
@@ -22,6 +21,26 @@ document.addEventListener("keydown", keydownHandler);
 document.addEventListener("keyup", keyupHandler);
 document.addEventListener("click", startGame);
 document.addEventListener("mousemove", mousemoveHandler);
+
+function startGame() {
+  if (distance < 30) {
+    screen = "level1";
+  }
+}
+
+function mousemoveHandler(event) {
+  let cnvRect = cnv.getBoundingClientRect();
+  let run = Math.abs(event.x - cnvRect.x - 500);
+  let rise = Math.abs(event.y - cnvRect.y - 300);
+  distance = Math.sqrt(run ** 2 + rise ** 2);
+
+  if (distance < 30) {
+    document.body.style.cursor = "pointer";
+  } else {
+    document.body.style.cursor = "default";
+  }
+}
+
 
 function keydownHandler(event) {
   if (event.code === "KeyD" || event.code === "ArrowRight") {
@@ -50,30 +69,10 @@ function keyupHandler(event) {
   }
 }
 
-function startGame() {
-  if (distance < 30) {
-    screen = "level1";
-  }
-}
-
-function mousemoveHandler(event) {
-  let run = Math.abs(event.x - cnvRect.x - 500);
-  let rise = Math.abs(event.y - cnvRect.y - 300);
-  distance = Math.sqrt(run ** 2 + rise ** 2);
-
-  if (distance < 30) {
-    document.body.style.cursor = "pointer";
-  } else {
-    document.body.style.cursor = "default";
-  }
-}
-
 // Main Program Loop (60 FPS)
 requestAnimationFrame(loop);
 
 function loop() {
-  // console.log();
-
   if (screen === "title") {
     ctx.fillStyle = "black";
     ctx.arc(500, 300, 30, 0, 2 * Math.PI);
@@ -117,7 +116,6 @@ function loop() {
     } else if (!jumping) {
       gravity = 10;
     }
-
     // prevent character from going off screen
     if (charX < 0) {
       charX = 0;
@@ -153,15 +151,3 @@ function loop() {
   }
   requestAnimationFrame(loop);
 }
-
-// Xander code
-
-// function click(event) {
-//   let mouseX = event.x - cnvRect.x;
-//   let mouseY = event.y - cnvRect.y;
-//   let run = Math.abs(mouseX - target1X || mouseX - target2X || mouseX - target3X);
-//   let rise = Math.abs(mouseY - target1Y || mouseY - target2Y || mouseY - target3Y);
-//   let distance = Math.sqrt(run ** 2 + rise ** 2);
-// }
-
-// https://www.w3schools.com/cssref/pr_class_cursor.asp
