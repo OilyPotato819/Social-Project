@@ -8,19 +8,26 @@ cnv.height = 600;
 
 // Global variables
 let screen = "title";
-let charX = 100;
-let charY = 100;
-let direction = "right";
 let rightIsPressed = false;
 let leftIsPressed = false;
-let jumping = false;
 let eIsPressed = false;
 let upIsPressed = false;
-let gravity = 0;
 let distance;
-let laserX, laserY;
-let shootLaser = "end";
-let laserTimer = 0;
+let char = {
+  x: 0,
+  y: 0,
+  direction: 0,
+  jumping: false,
+  gravity: 0
+};
+let laser = {
+  xMove: 0,
+  xLine: 0,
+  y: 0,
+  direction: 0,
+  shoot: false,
+  timer: 0
+};
 
 // Event listeners
 document.addEventListener("keydown", keydownHandler);
@@ -35,15 +42,17 @@ function startGame() {
 }
 
 function mousemoveHandler(event) {
-  let cnvRect = cnv.getBoundingClientRect();
-  let run = Math.abs(event.x - cnvRect.x - 500);
-  let rise = Math.abs(event.y - cnvRect.y - 300);
-  distance = Math.sqrt(run ** 2 + rise ** 2);
+  if (screen === "title") {
+    let cnvRect = cnv.getBoundingClientRect();
+    let run = Math.abs(event.x - cnvRect.x - 500);
+    let rise = Math.abs(event.y - cnvRect.y - 300);
+    distance = Math.sqrt(run ** 2 + rise ** 2);
 
-  if (distance < 30) {
-    document.body.style.cursor = "pointer";
-  } else {
-    document.body.style.cursor = "default";
+    if (distance < 30) {
+      document.body.style.cursor = "pointer";
+    } else {
+      document.body.style.cursor = "default";
+    }
   }
 }
 
@@ -89,9 +98,6 @@ function keyupHandler(event) {
 requestAnimationFrame(loop);
 
 function loop() {
-  console.log(direction);
-  // console.log(laserTimer);
-
   if (screen === "title") {
     ctx.fillStyle = "black";
     ctx.arc(500, 300, 30, 0, 2 * Math.PI);
@@ -125,69 +131,79 @@ function loop() {
     // }
 
     // LEVEL 5: Child Labour
-    // if (screen === "level15") {
+    // if (screen === "level5") {
 
     // }
 
     // CHARACTER
     ctx.fillStyle = "black";
-    ctx.fillRect(charX, charY, 25, 25);
+    ctx.fillRect(char.x, char.y, 25, 25);
 
     // move x
     if (rightIsPressed) {
-      charX += 5;
-      direction = "right";
+      char.x += 5;
+      char.direction = "right";
     } else if (leftIsPressed) {
-      charX -= 5;
-      direction = "left";
+      char.x -= 5;
+      char.direction = "left";
     }
 
     // jump
-    if (upIsPressed && !jumping) {
-      jumping = true;
-      gravity = -10;
+    if (upIsPressed && !char.jumping) {
+      char.jumping = true;
+      char.gravity = -10;
     }
-    charY += gravity;
-    if (jumping) {
-      gravity += 0.5;
+    char.y += char.gravity;
+    if (char.jumping) {
+      char.gravity += 0.5;
     }
-    if (charY > 440) {
-      gravity = 0;
-      jumping = false;
-    } else if (!jumping) {
-      gravity = 10;
+    if (char.y > 440) {
+      char.gravity = 0;
+      char.jumping = false;
+    } else if (!char.jumping) {
+      char.gravity = 10;
     }
     // prevent character from going off screen
-    if (charX < 0) {
-      charX = 0;
+    if (char.x < 0) {
+      char.x = 0;
     }
-    if (charX > cnv.width - 25) {
-      charX = cnv.width - 25;
+    if (char.x > cnv.width - 25) {
+      char.x = cnv.width - 25;
     }
 
     // Shoot laser
-    if (eIsPressed && shootLaser === "end") {
-      shootLaser = true;
-      laserTimer = 1;
-      laserX = charX + 25;
-      laserY = charY + 12.5;
+    if (eIsPressed && !laser.shoot) {
+      laser.shoot = true;
+      laser.timer = 1;
+      if (char.direction === "right") {
+        laser.xMove = char.x + 25;
+        laser.xLine = laser.xMove + 50;
+      } else {
+        laser.xMove = char.x;
+        laser.xLine = laser.xMove - 50;
+      }
+      laser.y = char.y + 12.5;
+      laser.direction = char.direction;
     }
-    if (shootLaser === true) {
+    if (laser.shoot === true) {
       ctx.lineWidth = 4;
       ctx.strokeStyle = "red";
       ctx.beginPath();
-      ctx.moveTo(laserX, laserY);
-      ctx.lineTo(700, laserY);
+      ctx.moveTo(laser.xMove, laser.y);
+      ctx.lineTo(laser.xLine, laser.y);
       ctx.stroke();
-      laserTimer++;
+      if (laser.direction === "right") {
+        laser.xMove += 40;
+        laser.xLine += 40;
+      } else if (laser.direction === "left") {
+        laser.xMove -= 40;
+        laser.xLine -= 40;
+      }
+      laser.timer++;
     }
-    if (laserTimer >= 10) {
-      shootLaser = false;
-      laserTimer++;
-    }
-    if (laserTimer >= 20) {
-      shootLaser = "end";
-      laserTimer = 0;
+    if (laser.timer >= 30) {
+      laser.shoot = false;
+      laser.timer = 0;
     }
   }
   requestAnimationFrame(loop);
