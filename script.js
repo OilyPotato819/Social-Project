@@ -38,6 +38,7 @@ document.addEventListener("mousemove", mousemoveHandler);
 function startGame() {
   if (distance < 30) {
     screen = "level1";
+    document.body.style.cursor = "default";
   }
 }
 
@@ -103,7 +104,6 @@ function loop() {
     ctx.arc(500, 300, 30, 0, 2 * Math.PI);
     ctx.fill();
   } else {
-    document.body.style.cursor = "default";
     // BACKGROUNDS
     // Start
     ctx.fillStyle = "white";
