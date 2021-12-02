@@ -18,7 +18,7 @@ let char = {
   y: 0,
   direction: 0,
   jumping: false,
-  gravity: 0
+  gravity: 0,
 };
 let laser = {
   xMove: 0,
@@ -26,7 +26,8 @@ let laser = {
   y: 0,
   direction: 0,
   shoot: false,
-  timer: 0
+  timer: 0,
+  collide: false,
 };
 
 // Event listeners
@@ -58,6 +59,9 @@ function mousemoveHandler(event) {
 }
 
 function keydownHandler(event) {
+  if (event.code === "KeyE") {
+    eIsPressed = true;
+  }
   if (event.code === "KeyD" || event.code === "ArrowRight") {
     rightIsPressed = true;
   }
@@ -71,12 +75,12 @@ function keydownHandler(event) {
   ) {
     upIsPressed = true;
   }
-  if (event.code === "KeyE") {
-    eIsPressed = true;
-  }
 }
 
 function keyupHandler(event) {
+  if (event.code === "KeyE") {
+    eIsPressed = false;
+  }
   if (event.code === "KeyD" || event.code === "ArrowRight") {
     rightIsPressed = false;
   }
@@ -89,9 +93,6 @@ function keyupHandler(event) {
     event.code === "Space"
   ) {
     upIsPressed = false;
-  }
-  if (event.code === "KeyE") {
-    eIsPressed = false;
   }
 }
 
@@ -147,7 +148,8 @@ function loop() {
     if (rightIsPressed) {
       char.x += 5;
       char.direction = "right";
-    } else if (leftIsPressed) {
+    }
+    if (leftIsPressed) {
       char.x -= 5;
       char.direction = "left";
     }
@@ -175,40 +177,61 @@ function loop() {
       char.x = cnv.width - 25;
     }
 
-    // Shoot laser
+    // LASER
+
+    // shoot laser
     if (eIsPressed && !laser.shoot) {
-      laser.shoot = true;
-      laser.timer = 1;
-      if (char.direction === "right") {
-        laser.xMove = char.x + 25;
-        laser.xLine = laser.xMove + 50;
-      } else {
-        laser.xMove = char.x;
-        laser.xLine = laser.xMove - 50;
-      }
       laser.y = char.y + 12.5;
       laser.direction = char.direction;
+      laser.shoot = true;
+      if (char.direction === "right") {
+        laser.xMove = char.x + 25;
+        laser.xLine = char.x + 25;
+      } else {
+        laser.xMove = char.x;
+        laser.xLine = char.x;
+      }
     }
     if (laser.shoot === true) {
+      // collision
+      if (laser.xLine > 545) {
+        laser.xLine = 545;
+        laser.collide = true;
+      }
+      if (laser.collide) {
+        if (laser.direction === "right") {
+          laser.xMove += 50;
+        } else if (laser.direction === "left") {
+          laser.xMove -= 50;
+        }
+      }
+      if (laser.xMove > 545) {
+        laser.xMove = 545;
+        laser.collide = true;
+      }
+      
       ctx.lineWidth = 4;
       ctx.strokeStyle = "red";
       ctx.beginPath();
       ctx.moveTo(laser.xMove, laser.y);
       ctx.lineTo(laser.xLine, laser.y);
       ctx.stroke();
+
       if (laser.direction === "right") {
-        laser.xMove += 40;
-        laser.xLine += 40;
+        laser.xLine += 50;
       } else if (laser.direction === "left") {
-        laser.xMove -= 40;
-        laser.xLine -= 40;
+        laser.xLine -= 50;
       }
+
       laser.timer++;
     }
     if (laser.timer >= 30) {
       laser.shoot = false;
       laser.timer = 0;
+      laser.collide = false;
     }
   }
   requestAnimationFrame(loop);
 }
+
+// ctx.fillRect(545, 425, 10, 50);
