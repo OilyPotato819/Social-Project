@@ -116,6 +116,9 @@ function loop() {
       ctx.drawImage(bg1, 0, 0, cnv.width, cnv.height);
     }
 
+    ctx.fillStyle = "blue";
+    ctx.fillRect(545, 425, 10, 50);
+
     // LEVEL 2: First Nations
     // if (screen === "level2") {
 
