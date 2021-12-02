@@ -103,6 +103,7 @@ function loop() {
     ctx.arc(500, 300, 30, 0, 2 * Math.PI);
     ctx.fill();
   } else {
+    document.body.style.cursor = "default";
     // BACKGROUNDS
     // Start
     ctx.fillStyle = "white";
