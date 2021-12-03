@@ -14,8 +14,8 @@ let eIsPressed = false;
 let upIsPressed = false;
 let distance;
 let char = {
-  x: 0,
-  y: 0,
+  x: 500,
+  y: 450,
   direction: 0,
   jumping: false,
   gravity: 0,
@@ -123,6 +123,8 @@ function loop() {
 
     ctx.fillStyle = "blue";
     ctx.fillRect(545, 425, 10, 50);
+    ctx.fillStyle = "blue";
+    ctx.fillRect(400, 425, 50, 10);
 
     // LEVEL 2: First Nations
     // if (screen === "level2") {
@@ -167,10 +169,11 @@ function loop() {
         char.gravity = -10;
       }
       char.y += char.gravity;
-      if (char.jumping) {
+      if (char.jumping && char.gravity <= 10) {
         char.gravity += 0.5;
       }
-      if (char.y > 440) {
+      if (char.y >= 450) {
+        char.y = 450;
         char.gravity = 0;
         char.jumping = false;
       } else if (!char.jumping) {
@@ -190,6 +193,7 @@ function loop() {
 
     // shoot laser
     if (eIsPressed && laser.shoot === "ready") {
+      char.gravity = 1;
       laser.width = 4;
       laser.y = char.y + 12.5;
       laser.shoot = true;
