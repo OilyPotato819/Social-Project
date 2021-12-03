@@ -24,10 +24,10 @@ let laser = {
   xMove: 0,
   xLine: 0,
   y: 0,
-  direction: 0,
-  shoot: false,
+  shoot: "ready",
   timer: 0,
   collide: false,
+  width: 0,
 };
 
 // Event listeners
@@ -104,6 +104,10 @@ function loop() {
     ctx.fillStyle = "black";
     ctx.arc(500, 300, 30, 0, 2 * Math.PI);
     ctx.fill();
+
+    ctx.font = "100px  Arial";
+    ctx.fillStyle = "black";
+    ctx.fillText("Titre", 420, 100);
   } else {
     // BACKGROUNDS
     // Start
@@ -145,30 +149,35 @@ function loop() {
     ctx.fillRect(char.x, char.y, 25, 25);
 
     // move x
-    if (rightIsPressed) {
-      char.x += 5;
-      char.direction = "right";
-    }
-    if (leftIsPressed) {
-      char.x -= 5;
-      char.direction = "left";
+    if (laser.shoot != true) {
+      if (rightIsPressed) {
+        char.x += 5;
+        char.direction = "right";
+      }
+      if (leftIsPressed) {
+        char.x -= 5;
+        char.direction = "left";
+      }
     }
 
     // jump
-    if (upIsPressed && !char.jumping) {
-      char.jumping = true;
-      char.gravity = -10;
+    if (laser.shoot != true) {
+      if (upIsPressed && !char.jumping) {
+        char.jumping = true;
+        char.gravity = -10;
+      }
+      char.y += char.gravity;
+      if (char.jumping) {
+        char.gravity += 0.5;
+      }
+      if (char.y > 440) {
+        char.gravity = 0;
+        char.jumping = false;
+      } else if (!char.jumping) {
+        char.gravity = 10;
+      }
     }
-    char.y += char.gravity;
-    if (char.jumping) {
-      char.gravity += 0.5;
-    }
-    if (char.y > 440) {
-      char.gravity = 0;
-      char.jumping = false;
-    } else if (!char.jumping) {
-      char.gravity = 10;
-    }
+
     // prevent character from going off screen
     if (char.x < 0) {
       char.x = 0;
@@ -180,9 +189,9 @@ function loop() {
     // LASER
 
     // shoot laser
-    if (eIsPressed && !laser.shoot) {
+    if (eIsPressed && laser.shoot === "ready") {
+      laser.width = 4;
       laser.y = char.y + 12.5;
-      laser.direction = char.direction;
       laser.shoot = true;
       if (char.direction === "right") {
         laser.xMove = char.x + 25;
@@ -193,42 +202,45 @@ function loop() {
       }
     }
     if (laser.shoot === true) {
-      // collision
-      if (laser.xLine > 545) {
-        laser.xLine = 545;
-        laser.collide = true;
-      }
-      if (laser.collide) {
-        if (laser.direction === "right") {
-          laser.xMove += 50;
-        } else if (laser.direction === "left") {
-          laser.xMove -= 50;
+      // lineTo changes until collision
+      if (char.direction === "right") {
+        while (!laser.collide) {
+          laser.xLine++;
+          if (laser.xLine === 545 && laser.y > 425 || laser.xLine === cnv.width + 1) {
+            laser.collide = true;
+          }
+        }
+      } else {
+        while (!laser.collide) {
+          laser.xLine--;
+          if (laser.xLine === 555 && laser.y > 425 || laser.xLine === -1) {
+            laser.collide = true;
+          }
         }
       }
-      if (laser.xMove > 545) {
-        laser.xMove = 545;
-        laser.collide = true;
-      }
-      
-      ctx.lineWidth = 4;
+
+      // draw
+      ctx.lineWidth = laser.width;
       ctx.strokeStyle = "red";
       ctx.beginPath();
       ctx.moveTo(laser.xMove, laser.y);
       ctx.lineTo(laser.xLine, laser.y);
       ctx.stroke();
-
-      if (laser.direction === "right") {
-        laser.xLine += 50;
-      } else if (laser.direction === "left") {
-        laser.xLine -= 50;
-      }
-
+    }
+    // timer
+    if (laser.shoot != false && laser.shoot != "ready") {
       laser.timer++;
     }
+    if (laser.timer >= 25) {
+      laser.width -= 1;
+    }
     if (laser.timer >= 30) {
-      laser.shoot = false;
-      laser.timer = 0;
+      laser.shoot = "cooldown";
       laser.collide = false;
+    }
+    if (laser.timer >= 60) {
+      laser.shoot = "ready";
+      laser.timer = 0;
     }
   }
   requestAnimationFrame(loop);
