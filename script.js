@@ -16,9 +16,9 @@ let distance;
 let char = {
   x: 500,
   y: 450,
-  direction: 0,
-  jumping: false,
+  facing: 0,
   gravity: 0,
+  yMove: "stay",
 };
 let laser = {
   xMove: 0,
@@ -154,30 +154,43 @@ function loop() {
     if (laser.shoot != true) {
       if (rightIsPressed) {
         char.x += 5;
-        char.direction = "right";
+        char.facing = "right";
       }
       if (leftIsPressed) {
         char.x -= 5;
-        char.direction = "left";
+        char.facing = "left";
       }
     }
 
     // jump
     if (laser.shoot != true) {
-      if (upIsPressed && !char.jumping) {
-        char.jumping = true;
+      char.y += char.gravity
+      if (upIsPressed && char.yMove === "stay") {
+        char.yMove = "up"
         char.gravity = -10;
       }
-      char.y += char.gravity;
-      if (char.jumping && char.gravity <= 10) {
-        char.gravity += 0.5;
+
+      if (char.yMove != "up") {
+        if (char.y >= 450) {
+          char.y = 450;
+          char.yMove = "stay";
+        } else if (char.y >= 400 && char.y <= 415 && char.x >= 380 && char.x <= 445) {
+          char.y = 400;
+          char.yMove = "stay";
+        } else {
+          char.yMove = "down";
+        }
       }
-      if (char.y >= 450) {
-        char.y = 450;
+
+      if (char.yMove === "stay") {
         char.gravity = 0;
-        char.jumping = false;
-      } else if (!char.jumping) {
-        char.gravity = 10;
+      } else {
+        char.gravity += 0.5;
+        if (char.gravity < 0) {
+          char.yMove = "up";
+        } else if (char.gravity > 0) {
+          char.yMove = "down";
+        }
       }
     }
 
@@ -197,7 +210,7 @@ function loop() {
       laser.width = 4;
       laser.y = char.y + 12.5;
       laser.shoot = true;
-      if (char.direction === "right") {
+      if (char.facing === "right") {
         laser.xMove = char.x + 25;
         laser.xLine = char.x + 25;
       } else {
@@ -207,7 +220,7 @@ function loop() {
     }
     if (laser.shoot === true) {
       // lineTo changes until collision
-      if (char.direction === "right") {
+      if (char.facing === "right") {
         while (!laser.collide) {
           laser.xLine++;
           if (laser.xLine === 545 && laser.y > 425 || laser.xLine === cnv.width + 1) {
@@ -249,5 +262,3 @@ function loop() {
   }
   requestAnimationFrame(loop);
 }
-
-// ctx.fillRect(545, 425, 10, 50);
