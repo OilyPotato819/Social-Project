@@ -95,6 +95,18 @@ function keyupHandler(event) {
   }
 }
 
+function newPlatform(x, y, w, h) {
+  return {
+    x: x,
+    y: y,
+    w: w,
+    h: h,
+  }
+}
+
+let platform1 = newPlatform(400, 425, 50, 10);
+let platform2 = newPlatform(545, 425, 10, 50);
+
 // Main Program Loop (60 FPS)
 requestAnimationFrame(loop);
 
@@ -109,14 +121,14 @@ function loop() {
     ctx.fillText("Titre", 420, 100);
   } else {
     // BACKGROUNDS
-
     if (screen === "level1-1") { // LEVEL 1: Route de la Soie
       background = document.getElementById("level1");
       ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
 
       ctx.fillStyle = "blue";
-      ctx.fillRect(545, 425, 10, 50);
-      ctx.fillRect(400, 425, 50, 10);
+      ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
+
+      ctx.fillRect(platform2.x, platform2.y, platform2.w, platform2.h);
     } else if (screen === "level1-2") {
       background = document.getElementById("");
       ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
@@ -171,37 +183,28 @@ function loop() {
         char.gravity = -10;
       }
 
+      // if (char.y >= 400 && char.y <= 415 && char.x >= 380 && char.x <= 445) {
+      //   char.y = 400;
+      //    char.yMove = "stay";
+      // }
+
+      // 450
+
       // check if standing on something
       if (char.yMove != "up") {
-        if (char.y >= 450) {
-          char.y = 450;
-          char.yMove = "stay";
-        } else if (screen === "level1-1") {
-          if (char.y >= 400 && char.y <= 415 && char.x >= 380 && char.x <= 445) {
-            char.y = 400;
-             char.yMove = "stay";
+        function platformCollide(aPlatform) {
+          if (char.x >= aPlatform.x && char.x + 25 <= (aPlatform.x + aPlatform.w) && char.y >= aPlatform.y && char.y <= (aPlatform.y + aPlatform.h)) {
+            char.yMove = "stay";
+            // char.y = aPlatform.y;
+          } else if (char.y >= 450) {
+            char.yMove = "stay";
+            char.y = 450;
           } else {
             char.yMove = "down";
           }
-        } else if (screen === "level1-2") {
-
-        } else if (screen === "level2-1") {
-          
-        } else if (screen === "level2-2") {
-
-        } else if (screen === "level3-1") {
-
-        } else if (screen === "level3-2") {
-
-        } else if (screen === "level4-1") {
-
-        } else if (screen === "level4-2") {
-
-        } else if (screen === "level5-1") {
-
-        } else if (screen === "level5-2") {
-
         }
+
+        platformCollide(platform1);
       }
 
       // fall or stay
