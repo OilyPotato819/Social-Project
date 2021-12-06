@@ -8,6 +8,7 @@ cnv.height = 600;
 
 // Global variables
 let screen = "title";
+let background;
 let rightIsPressed = false;
 let leftIsPressed = false;
 let eIsPressed = false;
@@ -38,7 +39,7 @@ document.addEventListener("mousemove", mousemoveHandler);
 
 function startGame() {
   if (distance < 30) {
-    screen = "level1";
+    screen = "level1-1";
     document.body.style.cursor = "default";
   }
 }
@@ -52,8 +53,6 @@ function mousemoveHandler(event) {
 
     if (distance < 30) {
       document.body.style.cursor = "pointer";
-    } else {
-      document.body.style.cursor = "default";
     }
   }
 }
@@ -110,41 +109,42 @@ function loop() {
     ctx.fillText("Titre", 420, 100);
   } else {
     // BACKGROUNDS
-    // Start
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, cnv.width, cnv.height);
 
-    // LEVEL 1: Route de la Soie
-    if (screen === "level1") {
-      // Backgroud
-      let bg1 = document.getElementById("level1");
-      ctx.drawImage(bg1, 0, 0, cnv.width, cnv.height);
+    if (screen === "level1-1") { // LEVEL 1: Route de la Soie
+      background = document.getElementById("level1");
+      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+
+      ctx.fillStyle = "blue";
+      ctx.fillRect(545, 425, 10, 50);
+      ctx.fillRect(400, 425, 50, 10);
+    } else if (screen === "level1-2") {
+      background = document.getElementById("");
+      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+    } else if (screen === "level2-1") { // LEVEL 2: First Nations
+      background = document.getElementById("");
+      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+    } else if (screen === "level2-2") {
+      background = document.getElementById("");
+      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+    } else if (screen === "level3-1") { // LEVEL 3: Europeans
+      background = document.getElementById("");
+      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+    } else if (screen === "level3-2") {
+      background = document.getElementById("");
+      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+    } else if (screen === "level4-1") { // LEVEL 4: Industrialisation in UK
+      background = document.getElementById("");
+      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+    } else if (screen === "level4-2") {
+      background = document.getElementById("");
+      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+    } else if (screen === "level5-1") { // LEVEL 5: Child Labour
+      background = document.getElementById("");
+      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+    } else if (screen === "level5-2") {
+      background = document.getElementById("");
+      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
     }
-
-    ctx.fillStyle = "blue";
-    ctx.fillRect(545, 425, 10, 50);
-    ctx.fillStyle = "blue";
-    ctx.fillRect(400, 425, 50, 10);
-
-    // LEVEL 2: First Nations
-    // if (screen === "level2") {
-
-    // }
-
-    // LEVEL 3: Europeans
-    // if (screen === "level3") {
-
-    // }
-
-    // LEVEL 4: Industrialisation in UK
-    // if (screen === "level4") {
-
-    // }
-
-    // LEVEL 5: Child Labour
-    // if (screen === "level5") {
-
-    // }
 
     // CHARACTER
     ctx.fillStyle = "black";
@@ -162,26 +162,49 @@ function loop() {
       }
     }
 
-    // jump
+    // gravity
     if (laser.shoot != true) {
+      // jump
       char.y += char.gravity
       if (upIsPressed && char.yMove === "stay") {
         char.yMove = "up"
         char.gravity = -10;
       }
 
+      // check if standing on something
       if (char.yMove != "up") {
         if (char.y >= 450) {
           char.y = 450;
           char.yMove = "stay";
-        } else if (char.y >= 400 && char.y <= 415 && char.x >= 380 && char.x <= 445) {
-          char.y = 400;
-          char.yMove = "stay";
-        } else {
-          char.yMove = "down";
+        } else if (screen === "level1-1") {
+          if (char.y >= 400 && char.y <= 415 && char.x >= 380 && char.x <= 445) {
+            char.y = 400;
+             char.yMove = "stay";
+          } else {
+            char.yMove = "down";
+          }
+        } else if (screen === "level1-2") {
+
+        } else if (screen === "level2-1") {
+          
+        } else if (screen === "level2-2") {
+
+        } else if (screen === "level3-1") {
+
+        } else if (screen === "level3-2") {
+
+        } else if (screen === "level4-1") {
+
+        } else if (screen === "level4-2") {
+
+        } else if (screen === "level5-1") {
+
+        } else if (screen === "level5-2") {
+
         }
       }
 
+      // fall or stay
       if (char.yMove === "stay") {
         char.gravity = 0;
       } else {
@@ -219,19 +242,98 @@ function loop() {
       }
     }
     if (laser.shoot === true) {
-      // lineTo changes until collision
       if (char.facing === "right") {
         while (!laser.collide) {
+          // laser moves right
           laser.xLine++;
-          if (laser.xLine === 545 && laser.y > 425 || laser.xLine === cnv.width + 1) {
-            laser.collide = true;
+          // check right side collision
+          if (screen === "level1-1") {
+            if (laser.xLine === 545 && laser.y > 425 || laser.xLine === cnv.width + 1) {
+              laser.collide = true;
+            }
+          } else if (screen === "level1-2") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level2-1") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level2-2") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level3-1") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level3-2") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level4-1") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level4-2") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level5-1") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level5-2") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
           }
         }
       } else {
         while (!laser.collide) {
+          // laser moves left
           laser.xLine--;
-          if (laser.xLine === 555 && laser.y > 425 || laser.xLine === -1) {
-            laser.collide = true;
+          // check left side collision
+          if (screen === "level1-1") {
+            if (laser.xLine === 555 && laser.y > 425 || laser.xLine === -1) {
+              laser.collide = true;
+            }
+          } else if (screen === "level1-2") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level2-1") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level2-2") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level3-1") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level3-2") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level4-1") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level4-2") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level5-1") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
+          } else if (screen === "level5-2") {
+            if (laser.xLine) {
+              laser.collide = true;
+            }
           }
         }
       }
