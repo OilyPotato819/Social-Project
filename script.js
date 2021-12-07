@@ -19,7 +19,7 @@ let char = {
   y: 450,
   facing: 0,
   gravity: 0,
-  yMove: "stay",
+  standing: true,
 };
 let laser = {
   xMove: 0,
@@ -101,17 +101,7 @@ function keyupHandler(event) {
 // CREATE LEVEL OBJECTS
 
 // Platform function
-function newPlatform(x, y, w, h) {
-  return {
-    x: x,
-    y: y,
-    w: w,
-    h: h,
-  }
-}
-
-// Wall function
-function newWall(x, y, w, h) {
+function newBlock(x, y, w, h) {
   return {
     x: x,
     y: y,
@@ -121,10 +111,10 @@ function newWall(x, y, w, h) {
 }
 
 // Create objects
-let platform1 = newPlatform(400, 425, 50, 10);
-let platform2 = newPlatform(500, 400, 50, 10);
-let wall1 = newWall(545, 425, 10, 50);
-let wall2 = newWall(300, 400, 10, 50);
+let platform1 = newBlock(400, 425, 50, 10);
+let platform2 = newBlock(500, 400, 50, 10);
+let wall1 = newBlock(545, 425, 10, 50);
+let wall2 = newBlock(300, 400, 10, 50);
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
@@ -185,42 +175,30 @@ function loop() {
     // Gravity
     if (laser.shoot != true) {
       // jump
-      char.y += char.gravity
-      if (upIsPressed && char.yMove === "stay") {
-        char.yMove = "up"
+      char.y += char.gravity;
+      char.gravity += 0.5;
+      if (upIsPressed && char.standing) {
+        char.standing = false;
+        char.y -= 10;
         char.gravity = -10;
       }
 
       // check if standing on something
-      if (char.yMove != "up") {
-        function platformCollide(aPlatform) {
-          if (char.x + 25 > aPlatform.x && char.x < (aPlatform.x + aPlatform.w) && char.y + 25 >= aPlatform.y && char.y + 25 <= (aPlatform.y + aPlatform.h)) {
-            char.yMove = "stay";
-            char.y = aPlatform.y - 25;
-            console.log(char.yMove)
-          } else {
-            char.yMove = "down";
-          }
-        }
-        if (char.y >= 450) {
-          char.yMove = "stay";
-          char.y = 450;
-        } else {
-          platformCollide(platform1);
-          platformCollide(platform2);
+      function platformCollide(aPlatform) {
+        if (char.x + 25 > aPlatform.x && char.x < (aPlatform.x + aPlatform.w) && char.y + 25 >= aPlatform.y && char.y + 25 <= (aPlatform.y + aPlatform.h)) {
+          char.y = aPlatform.y - 25;
+          char.gravity = 0;
+          char.standing = true;
         }
       }
 
-      // fall or stay
-      if (char.yMove === "stay") {
+      if (char.y >= 450) {
+        char.standing = true;
         char.gravity = 0;
-      } else {
-        char.gravity += 0.5;
-        if (char.gravity < 0) {
-          char.yMove = "up";
-        } else if (char.gravity > 0) {
-          char.yMove = "down";
-        }
+        char.y = 450;
+      } else if (char.gravity >= 0) {
+        platformCollide(platform1);
+        platformCollide(platform2);
       }
     }
 
