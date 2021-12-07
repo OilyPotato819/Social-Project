@@ -53,6 +53,8 @@ function mousemoveHandler(event) {
 
     if (distance < 30) {
       document.body.style.cursor = "pointer";
+    } else {
+      document.body.style.cursor = "default";
     }
   }
 }
@@ -104,8 +106,18 @@ function newPlatform(x, y, w, h) {
   }
 }
 
+function newWall(x, y, w, h) {
+  return {
+    x: x,
+    y: y,
+    w: w,
+    h: h,
+  }
+}
+
 let platform1 = newPlatform(400, 425, 50, 10);
-let platform2 = newPlatform(545, 425, 10, 50);
+let wall1 = newWall(545, 425, 10, 50);
+let wall2 = newWall(300, 400, 10, 50);
 
 // Main Program Loop (60 FPS)
 requestAnimationFrame(loop);
@@ -128,7 +140,8 @@ function loop() {
       ctx.fillStyle = "blue";
       ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
 
-      ctx.fillRect(platform2.x, platform2.y, platform2.w, platform2.h);
+      ctx.fillRect(wall1.x, wall1.y, wall1.w, wall1.h);
+      ctx.fillRect(wall2.x, wall2.y, wall2.w, wall2.h);
     } else if (screen === "level1-2") {
       background = document.getElementById("");
       ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
@@ -183,28 +196,23 @@ function loop() {
         char.gravity = -10;
       }
 
-      // if (char.y >= 400 && char.y <= 415 && char.x >= 380 && char.x <= 445) {
-      //   char.y = 400;
-      //    char.yMove = "stay";
-      // }
-
-      // 450
-
       // check if standing on something
       if (char.yMove != "up") {
         function platformCollide(aPlatform) {
-          if (char.x >= aPlatform.x && char.x + 25 <= (aPlatform.x + aPlatform.w) && char.y >= aPlatform.y && char.y <= (aPlatform.y + aPlatform.h)) {
+          if (char.x + 25 > aPlatform.x && char.x < (aPlatform.x + aPlatform.w) && char.y + 25 >= aPlatform.y && char.y + 25 <= (aPlatform.y + aPlatform.h)) {
             char.yMove = "stay";
-            // char.y = aPlatform.y;
-          } else if (char.y >= 450) {
-            char.yMove = "stay";
-            char.y = 450;
+            char.y = aPlatform.y - 25;
           } else {
             char.yMove = "down";
           }
         }
 
-        platformCollide(platform1);
+        if (char.y >= 450) {
+          char.yMove = "stay";
+          char.y = 450;
+        } else {
+          platformCollide(platform1);
+        }
       }
 
       // fall or stay
@@ -245,99 +253,25 @@ function loop() {
       }
     }
     if (laser.shoot === true) {
-      if (char.facing === "right") {
-        while (!laser.collide) {
-          // laser moves right
+      while (!laser.collide) {
+        // laser moves left or right
+        if (char.facing === "right") {
           laser.xLine++;
-          // check right side collision
-          if (screen === "level1-1") {
-            if (laser.xLine === 545 && laser.y > 425 || laser.xLine === cnv.width + 1) {
-              laser.collide = true;
-            }
-          } else if (screen === "level1-2") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level2-1") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level2-2") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level3-1") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level3-2") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level4-1") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level4-2") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level5-1") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level5-2") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
+        }
+        if (char.facing === "left") {
+          laser.xLine--;
+        }
+        // check collision
+        function wallCollide(aWall) {
+          if ((laser.xLine === aWall.x || laser.xLine === aWall.x + aWall.w) && laser.y > aWall.y && laser.y < aWall.y + aWall.h) {
+            laser.collide = true;
           }
         }
-      } else {
-        while (!laser.collide) {
-          // laser moves left
-          laser.xLine--;
-          // check left side collision
-          if (screen === "level1-1") {
-            if (laser.xLine === 555 && laser.y > 425 || laser.xLine === -1) {
-              laser.collide = true;
-            }
-          } else if (screen === "level1-2") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level2-1") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level2-2") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level3-1") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level3-2") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level4-1") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level4-2") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level5-1") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          } else if (screen === "level5-2") {
-            if (laser.xLine) {
-              laser.collide = true;
-            }
-          }
+        wallCollide(wall1);
+        wallCollide(wall2);
+
+        if (laser.xLine < -1 || laser.xLine > cnv.width + 1) {
+          laser.collide = true;
         }
       }
 
