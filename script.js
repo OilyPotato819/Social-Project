@@ -1,12 +1,12 @@
 // Social Studies Game by Oli and Xander
 
-// Setup canvas and graphics context
+// SETUP CANVAS AND GRAPHICS CONTEXT
 let cnv = document.getElementById("my_canvas");
 let ctx = cnv.getContext("2d");
 cnv.width = 1000;
 cnv.height = 600;
 
-// Global variables
+// GLOBAL VARIABLES
 let screen = "title";
 let background;
 let rightIsPressed = false;
@@ -31,12 +31,13 @@ let laser = {
   width: 0,
 };
 
-// Event listeners
+// EVENT LISTENERS
 document.addEventListener("keydown", keydownHandler);
 document.addEventListener("keyup", keyupHandler);
 document.addEventListener("click", startGame);
 document.addEventListener("mousemove", mousemoveHandler);
 
+// FUNCTIONS
 function startGame() {
   if (distance < 30) {
     screen = "level1-1";
@@ -97,6 +98,9 @@ function keyupHandler(event) {
   }
 }
 
+// CREATE LEVEL OBJECTS
+
+// Platform function
 function newPlatform(x, y, w, h) {
   return {
     x: x,
@@ -106,6 +110,7 @@ function newPlatform(x, y, w, h) {
   }
 }
 
+// Wall function
 function newWall(x, y, w, h) {
   return {
     x: x,
@@ -115,67 +120,49 @@ function newWall(x, y, w, h) {
   }
 }
 
+// Create objects
 let platform1 = newPlatform(400, 425, 50, 10);
+let platform2 = newPlatform(500, 400, 50, 10);
 let wall1 = newWall(545, 425, 10, 50);
 let wall2 = newWall(300, 400, 10, 50);
 
-// Main Program Loop (60 FPS)
+// MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
 
 function loop() {
   if (screen === "title") {
+    // TITLE SCREEN
+
+    // Play button
     ctx.fillStyle = "black";
     ctx.arc(500, 300, 30, 0, 2 * Math.PI);
     ctx.fill();
 
+    // Title
     ctx.font = "100px  Arial";
     ctx.fillStyle = "black";
     ctx.fillText("Titre", 420, 100);
   } else {
-    // BACKGROUNDS
-    if (screen === "level1-1") { // LEVEL 1: Route de la Soie
-      background = document.getElementById("level1");
-      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+    // SET UP LEVEL
 
-      ctx.fillStyle = "blue";
-      ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
+    // Background
+    background = document.getElementById("level1");
+    ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
 
-      ctx.fillRect(wall1.x, wall1.y, wall1.w, wall1.h);
-      ctx.fillRect(wall2.x, wall2.y, wall2.w, wall2.h);
-    } else if (screen === "level1-2") {
-      background = document.getElementById("");
-      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
-    } else if (screen === "level2-1") { // LEVEL 2: First Nations
-      background = document.getElementById("");
-      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
-    } else if (screen === "level2-2") {
-      background = document.getElementById("");
-      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
-    } else if (screen === "level3-1") { // LEVEL 3: Europeans
-      background = document.getElementById("");
-      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
-    } else if (screen === "level3-2") {
-      background = document.getElementById("");
-      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
-    } else if (screen === "level4-1") { // LEVEL 4: Industrialisation in UK
-      background = document.getElementById("");
-      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
-    } else if (screen === "level4-2") {
-      background = document.getElementById("");
-      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
-    } else if (screen === "level5-1") { // LEVEL 5: Child Labour
-      background = document.getElementById("");
-      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
-    } else if (screen === "level5-2") {
-      background = document.getElementById("");
-      ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
-    }
+    // Platforms
+    ctx.fillStyle = "blue";
+    ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
+    ctx.fillRect(platform2.x, platform2.y, platform2.w, platform2.h);
+
+    // Walls
+    ctx.fillRect(wall1.x, wall1.y, wall1.w, wall1.h);
+    ctx.fillRect(wall2.x, wall2.y, wall2.w, wall2.h);
 
     // CHARACTER
     ctx.fillStyle = "black";
     ctx.fillRect(char.x, char.y, 25, 25);
 
-    // move x
+    // Move x
     if (laser.shoot != true) {
       if (rightIsPressed) {
         char.x += 5;
@@ -187,7 +174,15 @@ function loop() {
       }
     }
 
-    // gravity
+    // prevent character from going off screen
+    if (char.x < 0) {
+      char.x = 0;
+    }
+    if (char.x > cnv.width - 25) {
+      char.x = cnv.width - 25;
+    }
+
+    // Gravity
     if (laser.shoot != true) {
       // jump
       char.y += char.gravity
@@ -202,16 +197,17 @@ function loop() {
           if (char.x + 25 > aPlatform.x && char.x < (aPlatform.x + aPlatform.w) && char.y + 25 >= aPlatform.y && char.y + 25 <= (aPlatform.y + aPlatform.h)) {
             char.yMove = "stay";
             char.y = aPlatform.y - 25;
+            console.log(char.yMove)
           } else {
             char.yMove = "down";
           }
         }
-
         if (char.y >= 450) {
           char.yMove = "stay";
           char.y = 450;
         } else {
           platformCollide(platform1);
+          platformCollide(platform2);
         }
       }
 
@@ -228,17 +224,9 @@ function loop() {
       }
     }
 
-    // prevent character from going off screen
-    if (char.x < 0) {
-      char.x = 0;
-    }
-    if (char.x > cnv.width - 25) {
-      char.x = cnv.width - 25;
-    }
-
     // LASER
 
-    // shoot laser
+    // Shoot laser
     if (eIsPressed && laser.shoot === "ready") {
       char.gravity = 1;
       laser.width = 4;
@@ -254,14 +242,15 @@ function loop() {
     }
     if (laser.shoot === true) {
       while (!laser.collide) {
-        // laser moves left or right
+        // Laser moves left or right
         if (char.facing === "right") {
           laser.xLine++;
         }
         if (char.facing === "left") {
           laser.xLine--;
         }
-        // check collision
+
+        // Check collision
         function wallCollide(aWall) {
           if ((laser.xLine === aWall.x || laser.xLine === aWall.x + aWall.w) && laser.y > aWall.y && laser.y < aWall.y + aWall.h) {
             laser.collide = true;
@@ -269,13 +258,12 @@ function loop() {
         }
         wallCollide(wall1);
         wallCollide(wall2);
-
         if (laser.xLine < -1 || laser.xLine > cnv.width + 1) {
           laser.collide = true;
         }
       }
 
-      // draw
+      // Draw laser
       ctx.lineWidth = laser.width;
       ctx.strokeStyle = "red";
       ctx.beginPath();
@@ -283,7 +271,7 @@ function loop() {
       ctx.lineTo(laser.xLine, laser.y);
       ctx.stroke();
     }
-    // timer
+    // Laser timer
     if (laser.shoot != false && laser.shoot != "ready") {
       laser.timer++;
     }
@@ -301,3 +289,9 @@ function loop() {
   }
   requestAnimationFrame(loop);
 }
+
+// LEVEL 1: Route de la Soie
+// LEVEL 2: First Nations
+// LEVEL 3: Europeans
+// LEVEL 4: Industrialisation in UK
+// LEVEL 5: Child Labour
