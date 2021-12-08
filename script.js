@@ -197,6 +197,7 @@ function loop() {
         char.gravity = 0;
         char.y = 450;
       } else if (char.gravity >= 0) {
+        char.standing = false;
         platformCollide(platform1);
         platformCollide(platform2);
       }
