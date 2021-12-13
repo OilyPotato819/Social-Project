@@ -141,8 +141,11 @@ function loop() {
     background = document.getElementById("level4");
     ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
 
-    let worker = document.getElementById("factory-worker");
-    ctx.drawImage(worker, 600, 422);
+    ctx.drawImage(document.getElementById("factory-worker"), 600, 422);
+
+    if (char.x < 200) {
+      ctx.drawImage(document.getElementById("factory-interior"), 0, 271, 200, 207);
+    }
     
     // Platforms
     // ctx.fillStyle = "blue";
