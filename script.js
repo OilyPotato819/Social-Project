@@ -46,7 +46,7 @@ function startGame() {
 }
 
 function mousemoveHandler(event) {
-  if (screen === "title") {
+  // if (screen === "title") {
     let cnvRect = cnv.getBoundingClientRect();
     let run = Math.abs(event.x - cnvRect.x - 500);
     let rise = Math.abs(event.y - cnvRect.y - 300);
@@ -57,7 +57,9 @@ function mousemoveHandler(event) {
     } else {
       document.body.style.cursor = "default";
     }
-  }
+    console.log(event.x - cnvRect.x)
+    console.log(event.y - cnvRect.y)
+  // }
 }
 
 function keydownHandler(event) {
@@ -115,6 +117,7 @@ let platform1 = newBlock(400, 425, 50, 10);
 let platform2 = newBlock(500, 400, 50, 10);
 let wall1 = newBlock(545, 425, 10, 50);
 let wall2 = newBlock(300, 400, 10, 50);
+let wall3 = newBlock(551, 390, 42, 35);
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
@@ -136,17 +139,17 @@ function loop() {
     // SET UP LEVEL
 
     // Background
-    background = document.getElementById("level1");
+    background = document.getElementById("puzzle");
     ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
 
     // Platforms
-    ctx.fillStyle = "blue";
-    ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
-    ctx.fillRect(platform2.x, platform2.y, platform2.w, platform2.h);
+    // ctx.fillStyle = "blue";
+    // ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
+    // ctx.fillRect(platform2.x, platform2.y, platform2.w, platform2.h);
 
     // Walls
-    ctx.fillRect(wall1.x, wall1.y, wall1.w, wall1.h);
-    ctx.fillRect(wall2.x, wall2.y, wall2.w, wall2.h);
+    // ctx.fillRect(wall1.x, wall1.y, wall1.w, wall1.h);
+    // ctx.fillRect(wall2.x, wall2.y, wall2.w, wall2.h);
 
     // CHARACTER
     ctx.fillStyle = "black";
@@ -198,8 +201,8 @@ function loop() {
         char.y = 450;
       } else if (char.gravity >= 0) {
         char.standing = false;
-        platformCollide(platform1);
-        platformCollide(platform2);
+        // platformCollide(platform1);
+        // platformCollide(platform2);
       }
     }
 
@@ -235,8 +238,9 @@ function loop() {
             laser.collide = true;
           }
         }
-        wallCollide(wall1);
-        wallCollide(wall2);
+        // wallCollide(wall1);
+        // wallCollide(wall2);
+        wallCollide(wall3);
         if (laser.xLine < -1 || laser.xLine > cnv.width + 1) {
           laser.collide = true;
         }
