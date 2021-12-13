@@ -57,8 +57,7 @@ function mousemoveHandler(event) {
     } else {
       document.body.style.cursor = "default";
     }
-    console.log(event.x - cnvRect.x)
-    console.log(event.y - cnvRect.y)
+    console.log("x: " + (event.x - cnvRect.x), "y: " + (event.y - cnvRect.y));
   // }
 }
 
@@ -139,9 +138,12 @@ function loop() {
     // SET UP LEVEL
 
     // Background
-    background = document.getElementById("puzzle");
+    background = document.getElementById("level4");
     ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
 
+    let worker = document.getElementById("factory-worker");
+    ctx.drawImage(worker, 600, 422);
+    
     // Platforms
     // ctx.fillStyle = "blue";
     // ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
@@ -152,7 +154,7 @@ function loop() {
     // ctx.fillRect(wall2.x, wall2.y, wall2.w, wall2.h);
 
     // CHARACTER
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "yellow";
     ctx.fillRect(char.x, char.y, 25, 25);
 
     // Move x

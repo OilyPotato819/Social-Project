@@ -9,3 +9,6 @@ img {
 canvas {
   border: 1px solid black;
 }
+#fn {
+  display: block;
+}
