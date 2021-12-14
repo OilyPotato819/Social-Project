@@ -14,6 +14,7 @@ let leftIsPressed = false;
 let eIsPressed = false;
 let upIsPressed = false;
 let distance;
+let opacity = 0;
 let char = {
   x: 500,
   y: 450,
@@ -47,17 +48,17 @@ function startGame() {
 
 function mousemoveHandler(event) {
   // if (screen === "title") {
-    let cnvRect = cnv.getBoundingClientRect();
-    let run = Math.abs(event.x - cnvRect.x - 500);
-    let rise = Math.abs(event.y - cnvRect.y - 300);
-    distance = Math.sqrt(run ** 2 + rise ** 2);
+  let cnvRect = cnv.getBoundingClientRect();
+  let run = Math.abs(event.x - cnvRect.x - 500);
+  let rise = Math.abs(event.y - cnvRect.y - 300);
+  distance = Math.sqrt(run ** 2 + rise ** 2);
 
-    if (distance < 30) {
-      document.body.style.cursor = "pointer";
-    } else {
-      document.body.style.cursor = "default";
-    }
-    console.log("x: " + (event.x - cnvRect.x), "y: " + (event.y - cnvRect.y));
+  if (distance < 30) {
+    document.body.style.cursor = "pointer";
+  } else {
+    document.body.style.cursor = "default";
+  }
+  console.log("x: " + (event.x - cnvRect.x), "y: " + (event.y - cnvRect.y));
   // }
 }
 
@@ -116,7 +117,7 @@ let platform1 = newBlock(400, 425, 50, 10);
 let platform2 = newBlock(500, 400, 50, 10);
 let wall1 = newBlock(545, 425, 10, 50);
 let wall2 = newBlock(300, 400, 10, 50);
-let wall3 = newBlock(551, 390, 42, 35);
+let wall3 = newBlock(551, 391, 42, 35);
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
@@ -143,10 +144,17 @@ function loop() {
 
     ctx.drawImage(document.getElementById("factory-worker"), 600, 422);
 
-    if (char.x < 200) {
+    if (screen === "level4") {
+      if (char.x < 200 && opacity < 10) {
+        opacity += 1;
+      } else if (char.x > 200 && opacity > 0) {
+        opacity -= 1;
+      }
+      ctx.globalAlpha = opacity / 10
       ctx.drawImage(document.getElementById("factory-interior"), 0, 271, 200, 207);
+      ctx.globalAlpha = 1
     }
-    
+
     // Platforms
     // ctx.fillStyle = "blue";
     // ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
