@@ -117,7 +117,7 @@ let platform1 = newBlock(400, 425, 50, 10);
 let platform2 = newBlock(500, 400, 50, 10);
 let wall1 = newBlock(545, 425, 10, 50);
 let wall2 = newBlock(300, 400, 10, 50);
-let wall3 = newBlock(551, 391, 42, 35);
+let wall3 = newBlock(550, 391, 43, 35);
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
@@ -144,7 +144,7 @@ function loop() {
 
     ctx.drawImage(document.getElementById("factory-worker"), 600, 422);
 
-    if (screen === "level4") {
+    // if (screen === "level4") {
       if (char.x < 200 && opacity < 10) {
         opacity += 1;
       } else if (char.x > 200 && opacity > 0) {
@@ -153,7 +153,7 @@ function loop() {
       ctx.globalAlpha = opacity / 10
       ctx.drawImage(document.getElementById("factory-interior"), 0, 271, 200, 207);
       ctx.globalAlpha = 1
-    }
+    // }
 
     // Platforms
     // ctx.fillStyle = "blue";
