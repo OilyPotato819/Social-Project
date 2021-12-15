@@ -119,7 +119,7 @@ let platform1 = newBlock(400, 425, 50, 10);
 let platform2 = newBlock(500, 400, 50, 10);
 let wall1 = newBlock(545, 425, 10, 50);
 let wall2 = newBlock(300, 400, 10, 50);
-let wall3 = newBlock(550, 391, 43, 35, "hole");
+let wall3 = newBlock(549, 391, 45, 35, "hole");
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
@@ -144,7 +144,7 @@ function loop() {
     background = document.getElementById("level4");
     ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
 
-    ctx.drawImage(document.getElementById("factory-worker"), 600, 422);
+    ctx.drawImage(document.getElementById("factory-workers"), 400, 300);
 
     // if (screen === "level4") {
     if (char.x < 200 && opacity < 10) {
@@ -249,7 +249,7 @@ function loop() {
 
         // Check collision
         function wallCollide(aWall) {
-          if ((laser.xLine === aWall.x || laser.xLine === aWall.x + aWall.w) && laser.y > aWall.y && laser.y < aWall.y + aWall.h) {
+          if (laser.xLine > aWall.x && laser.xLine < aWall.x + aWall.w && laser.y > aWall.y && laser.y < aWall.y + aWall.h) {
             laser.collide = true;
             if (aWall.action === "hole")
               openHole = true;
@@ -292,6 +292,7 @@ function loop() {
       ctx.fillStyle = "white";
       ctx.fillRect(500, 100, 100, holeHeight)
       holeHeight++;
+      console.log(holeHeight)
     }
   }
   requestAnimationFrame(loop);
