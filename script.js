@@ -43,11 +43,14 @@ document.addEventListener("mousemove", mousemoveHandler);
 
 // FUNCTIONS
 function startGame() {
-  if (distance < 30) {
-    screen = "level1";
-    level1Setup();
-    document.body.style.cursor = "default";
+  if (screen === "title") {
+    if (distance < 30) {
+      screen = "level1";
+      level1Setup();
+      document.body.style.cursor = "default";
+    }
   }
+
 }
 
 function mousemoveHandler(event) {
@@ -240,14 +243,16 @@ function loop() {
 
     if (openHole) {
       ctx.fillStyle = "#9e939e";
-      ctx.fillRect(700, 473, 100, hole.h)
+      hole.x = 700;
+      hole.y = 473;
+      hole.w = 100;
       if (hole.h < cnv.height) {
         hole.h += 2;
       }
     }
 
     // CHARACTER
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = "green";
     ctx.fillRect(char.x, char.y, char.w, char.h);
 
     // Move x
@@ -274,7 +279,9 @@ function loop() {
     if (laser.shoot != true) {
       // jump
       char.y += char.gravity;
-      char.gravity += 0.5;
+      if (char.gravity <= 10) {
+        char.gravity += 0.5;
+      }
       if (upIsPressed && char.standing) {
         char.standing = false;
         char.y -= 10;
@@ -291,9 +298,8 @@ function loop() {
       }
 
       if (char.x > hole.x && char.x < (hole.x + hole.w) && openHole) {
+        char.standing = false;
         if (char.y >= hole.y + hole.h - char.h - 2) {
-          char.standing = true;
-          char.gravity = 0;
           char.y = hole.y + hole.h - char.h;
         }
       } else if (char.y >= 449) {
@@ -338,30 +344,40 @@ function level1Setup() {
 
 function level2Setup() {
   if (screen = "level2") {
+    // background = document.getElementbyId("level2");
   }
 }
 
 function level3Setup() {
   if (screen = "level3") {
+    // background = document.getElementbyId("level3");
 
   }
 }
 
 function level4Setup() {
   if (screen = "level4") {
+    // background = document.getElementbyId("level4");
 
   }
 }
 
 function level5Setup() {
   if (screen = "level5") {
+    // background = document.getElementbyId("level5");
 
   }
 }
 
 function puzzle1Setup() {
   if (screen = "puzzle1") {
-
+    background = document.getElementById("puzzle");
+    openHole = false;
+    hole.x = 0;
+    hole.y = 0;
+    hole.w = 0;
+    hole.h = 0;
+    char.y = 0 - char.h;
   }
 }
 
