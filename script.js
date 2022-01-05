@@ -151,7 +151,7 @@ function loop() {
     ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
 
     // factory interior
-    if (screen === "level4") {
+    if (background === document.getElementById("level4")) {
       if (char.x < 200 && opacity < 10) {
         opacity += 1;
       } else if (char.x > 200 && opacity > 0) {
@@ -327,13 +327,15 @@ function loop() {
 
 function level1Setup() {
   if (screen = "level1") {
-    background = document.getElementById("level2");
+    background = document.getElementById("level3");
     wall1.x = -50;
     wall1.y = -50;
     wall2.x = -50;
     wall2.y = -50;
-    wall3.x = -50;
-    wall3.y = -50;
+    wall3.x = 549;
+    wall3.y = 386;
+    wall3.w = 45.1;
+    wall3.h = 50;
     platform1.x = -50;
     platform1.y = -50;
     platform2.x = -50;
