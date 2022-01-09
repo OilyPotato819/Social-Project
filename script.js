@@ -327,7 +327,7 @@ function loop() {
 
 function level1Setup() {
   if (screen = "level1") {
-    background = document.getElementById("level3");
+    background = document.getElementById("level1");
     wall1.x = -50;
     wall1.y = -50;
     wall2.x = -50;
