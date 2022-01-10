@@ -110,13 +110,14 @@ function keyupHandler(event) {
 // CREATE LEVEL OBJECTS
 
 // Platform function
-function newBlock(x, y, w, h, action) {
+function newBlock(x, y, w, h, action, color) {
   return {
     x: x,
     y: y,
     w: w,
     h: h,
     action: action,
+    color: color,
   }
 }
 
@@ -128,7 +129,7 @@ let lWall2 = newBlock(0, 0, 10, 50);
 let pWall1 = newBlock(0, 0, 1, 0);
 let pWall2 = newBlock(0, 0, 1, 0);
 let activateHole = newBlock(0, 0, 45, 35, "hole");
-let hole = newBlock(0, 0, 100, 0);
+let hole = newBlock(0, 474, 100, 0);
 let mirror = newBlock(0, 0, 50, 10);
 
 // MAIN PROGRAM LOOP
@@ -170,16 +171,18 @@ function loop() {
     ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
     ctx.fillRect(platform2.x, platform2.y, platform2.w, platform2.h);
 
-    // Hole
-    ctx.fillRect(hole.x, hole.y, hole.w, hole.h);
+
 
     // Walls
     ctx.fillRect(lWall1.x, lWall1.y, lWall1.w, lWall1.h);
     ctx.fillRect(lWall2.x, lWall2.y, lWall2.w, lWall2.h);
     ctx.fillRect(activateHole.x, activateHole.y, activateHole.w, activateHole.h);
-    ctx.fillStyle = "green";
+    ctx.fillStyle = hole.color;
     ctx.fillRect(pWall1.x, pWall1.y, pWall1.w, pWall1.h);
     ctx.fillRect(pWall2.x, pWall2.y, pWall2.w, pWall2.h);
+
+    // Hole
+    ctx.fillRect(hole.x, hole.y, hole.w, hole.h);
 
     // LASER
 
@@ -249,10 +252,6 @@ function loop() {
     }
 
     if (openHole) {
-      ctx.fillStyle = "#9e939e";
-      hole.x = 700;
-      hole.y = 473;
-      hole.w = 100;
       if (hole.h < cnv.height) {
         hole.h += 2;
       }
@@ -270,20 +269,21 @@ function loop() {
 
     // Move x
     if (laser.shoot != true) {
-      if (rightIsPressed) {
+      if (rightIsPressed && !leftIsPressed) {
         char.x += 5;
         char.facing = "right";
       }
-      if (leftIsPressed) {
+      if (leftIsPressed && !rightIsPressed) {
         char.x -= 5;
         char.facing = "left";
       }
+
       function wallCollide(aWall) {
         if (char.x + char.w > aWall.x && char.x < aWall.x + aWall.w && char.y + char.h > aWall.y && char.y < aWall.y + aWall.h) {
-          if (char.x + char.w < aWall.x) {
+          if (char.facing === "right") {
             char.x = aWall.x + aWall.w - char.w
-          } else if (char.x > aWall.x + aWall.w) {
-            char.x = aWall.x
+          } else if (char.facing === "left") {
+            char.x = aWall.x + aWall.w
           }
         }
       }
@@ -364,7 +364,8 @@ function level1Setup() {
     platform1.y = -50;
     platform2.x = -50;
     platform2.y = -50;
-    hole.x = -49;
+    hole.x = 920;
+    hole.color = "#cea61b"
   }
 }
 
@@ -399,13 +400,18 @@ function level5Setup() {
 }
 
 function puzzle1Setup() {
+  console.log("yee")
   if (screen = "puzzle1") {
     background = document.getElementById("puzzle");
     openHole = false;
-    hole.x = 0;
-    hole.y = 0;
-    hole.w = 0;
-    hole.h = 0;
+    hole.x = -50;
+    hole.y = -50;
+    hole.w = -50;
+    hole.h = -50;
+    activateHole.x = -50;
+    activateHole.y = -50;
+    activateHole.w = -50;
+    activateHole.h = -50;
     char.y = 0 - char.h;
   }
 }
