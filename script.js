@@ -121,12 +121,15 @@ function newBlock(x, y, w, h, action) {
 }
 
 // Create objects
-let platform1 = newBlock(400, 425, 50, 10);
-let platform2 = newBlock(500, 400, 50, 10);
-let wall1 = newBlock(545, 425, 10, 50);
-let wall2 = newBlock(300, 400, 10, 50);
-let wall3 = newBlock(549, 391, 45, 35, "hole");
-let hole = newBlock(700, 473, 100, 0);
+let platform1 = newBlock(0, 0, 50, 10);
+let platform2 = newBlock(0, 0, 50, 10);
+let lWall1 = newBlock(0, 0, 10, 50);
+let lWall2 = newBlock(0, 0, 10, 50);
+let pWall1 = newBlock(0, 0, 1, 0);
+let pWall2 = newBlock(0, 0, 1, 0);
+let activateHole = newBlock(0, 0, 45, 35, "hole");
+let hole = newBlock(0, 0, 100, 0);
+let mirror = newBlock(0, 0, 50, 10);
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
@@ -171,8 +174,12 @@ function loop() {
     ctx.fillRect(hole.x, hole.y, hole.w, hole.h);
 
     // Walls
-    ctx.fillRect(wall1.x, wall1.y, wall1.w, wall1.h);
-    ctx.fillRect(wall2.x, wall2.y, wall2.w, wall2.h);
+    ctx.fillRect(lWall1.x, lWall1.y, lWall1.w, lWall1.h);
+    ctx.fillRect(lWall2.x, lWall2.y, lWall2.w, lWall2.h);
+    ctx.fillRect(activateHole.x, activateHole.y, activateHole.w, activateHole.h);
+    ctx.fillStyle = "green";
+    ctx.fillRect(pWall1.x, pWall1.y, pWall1.w, pWall1.h);
+    ctx.fillRect(pWall2.x, pWall2.y, pWall2.w, pWall2.h);
 
     // LASER
 
@@ -209,9 +216,9 @@ function loop() {
             }
           }
         }
-        wallCollide(wall1);
-        wallCollide(wall2);
-        wallCollide(wall3);
+        wallCollide(lWall1);
+        wallCollide(lWall2);
+        wallCollide(activateHole);
         if (laser.xLine < -1 || laser.xLine > cnv.width + 1) {
           laser.collide = true;
         }
@@ -249,6 +256,12 @@ function loop() {
       if (hole.h < cnv.height) {
         hole.h += 2;
       }
+      pWall1.x = hole.x;
+      pWall1.y = hole.y;
+      pWall1.h = hole.h;
+      pWall2.x = hole.x + 100;
+      pWall2.y = hole.y;
+      pWall2.h = hole.h;
     }
 
     // CHARACTER
@@ -265,6 +278,17 @@ function loop() {
         char.x -= 5;
         char.facing = "left";
       }
+      function wallCollide(aWall) {
+        if (char.x + char.w > aWall.x && char.x < aWall.x + aWall.w && char.y + char.h > aWall.y && char.y < aWall.y + aWall.h) {
+          if (char.x + char.w < aWall.x) {
+            char.x = aWall.x + aWall.w - char.w
+          } else if (char.x > aWall.x + aWall.w) {
+            char.x = aWall.x
+          }
+        }
+      }
+      wallCollide(pWall1);
+      wallCollide(pWall2);
     }
 
     // prevent character from going off screen
@@ -328,19 +352,19 @@ function loop() {
 function level1Setup() {
   if (screen = "level1") {
     background = document.getElementById("level1");
-    wall1.x = -50;
-    wall1.y = -50;
-    wall2.x = -50;
-    wall2.y = -50;
-    wall3.x = 549;
-    wall3.y = 386;
-    wall3.w = 45.1;
-    wall3.h = 50;
+    lWall1.x = -50;
+    lWall1.y = -50;
+    lWall2.x = -50;
+    lWall2.y = -50;
+    activateHole.x = 549;
+    activateHole.y = 386;
+    activateHole.w = 45.1;
+    activateHole.h = 50;
     platform1.x = -50;
     platform1.y = -50;
     platform2.x = -50;
     platform2.y = -50;
-    hole.x = -50;
+    hole.x = -49;
   }
 }
 
@@ -360,7 +384,10 @@ function level3Setup() {
 function level4Setup() {
   if (screen = "level4") {
     // background = document.getElementbyId("level4");
-
+    // activateHole.x = 549;
+    // activateHole.y = 386;
+    // activateHole.w = 45.1;
+    // activateHole.h = 50;
   }
 }
 
