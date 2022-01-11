@@ -132,6 +132,7 @@ let wallC2 = newBlock(0, 0, 1, 0);
 let entrance = newBlock(0, 0, 45, 35, "hole");
 let hole = newBlock(0, 474, 100, 0);
 let mirror = newBlock(0, 0, 50, 10, "mirror", 90);
+let portal = newBlock(0, 0, 69, 90, "portal");
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
@@ -192,6 +193,9 @@ function loop() {
 
     // Hole
     ctx.fillRect(hole.x, hole.y, hole.w, hole.h);
+
+    // Portal
+    ctx.drawImage(document.getElementById("portal"), portal.x, portal.y, portal.w, portal.h);
 
     // LASER
 
@@ -301,7 +305,14 @@ function loop() {
 
       function wallCollide(aWall) {
         if (char.x + char.w > aWall.x && char.x < aWall.x + aWall.w && char.y + char.h > aWall.y && char.y < aWall.y + aWall.h) {
-          if (char.facing === "right") {
+          if (aWall.action = "portal") {
+            screen = screen.replace("puzzle", "level");
+            level1Setup();
+            level2Setup();
+            level3Setup();
+            level4Setup();
+            level5Setup();
+          } else if (char.facing === "right") {
             char.x = aWall.x + aWall.w - char.w
           } else if (char.facing === "left") {
             char.x = aWall.x + aWall.w
@@ -310,6 +321,7 @@ function loop() {
       }
       wallCollide(wallC1);
       wallCollide(wallC2);
+      wallCollide(portal);
     }
 
     // prevent character from going off screen
@@ -379,39 +391,39 @@ function level1Setup() {
     entrance.w = 45.1;
     entrance.h = 50;
     hole.x = 920;
-    hole.c = "#ffeb3b"
+    hole.c = "#ffeb3b";
   }
 }
 
 function level2Setup() {
   if (screen = "level2") {
-    // background = document.getElementbyId("level2");
-    // hideAll();
+    background = document.getElementbyId("level2");
+    hideAll();
   }
 }
 
 function level3Setup() {
   if (screen = "level3") {
-    // background = document.getElementbyId("level3");
-    // hideAll();
+    background = document.getElementbyId("level3");
+    hideAll();
   }
 }
 
 function level4Setup() {
   if (screen = "level4") {
-    // background = document.getElementbyId("level4");
-    // hideAll();
-    // entrance.x = 549;
-    // entrance.y = 386;
-    // entrance.w = 45.1;
-    // entrance.h = 50;
+    background = document.getElementbyId("level4");
+    hideAll();
+    entrance.x = 549;
+    entrance.y = 386;
+    entrance.w = 45.1;
+    entrance.h = 50;
   }
 }
 
 function level5Setup() {
   if (screen = "level5") {
-    // background = document.getElementbyId("level5");
-    // hideAll();
+    background = document.getElementbyId("level5");
+    hideAll();
   }
 }
 
@@ -424,6 +436,8 @@ function puzzle1Setup() {
     char.y = 0 - char.h;
     mirror.x = 400;
     mirror.y = 444;
+    portal.x = 900;
+    portal.y = 380;
   }
 }
 
@@ -459,6 +473,7 @@ function hideAll() {
   mirror.x = -100;
   platform1.x = -100;
   platform2.x = -100;
+  portal.x = -100;
 }
 
 // LEVEL 1: Route de la Soie
