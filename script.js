@@ -8,7 +8,7 @@ cnv.height = 600;
 
 // GLOBAL VARIABLES
 let screen = "title";
-let background;
+let background = document.getElementById("title");;
 let openHole;
 let rightIsPressed = false;
 let leftIsPressed = false;
@@ -46,7 +46,7 @@ function startGame() {
   if (screen === "title") {
     if (distance < 30) {
       screen = "level1";
-      puzzle1Setup();
+      level1Setup();
       document.body.style.cursor = "default";
     }
   }
@@ -123,34 +123,25 @@ function newBlock(x, y, w, h, a, r, c) {
 }
 
 // Create objects
-let platform1 = newBlock(0, 0, 50, 10);
-let platform2 = newBlock(0, 0, 50, 10);
-let wallL1 = newBlock(0, 0, 10, 50);
-let wallL2 = newBlock(0, 0, 10, 50);
-let wallC1 = newBlock(0, 0, 1, 0);
-let wallC2 = newBlock(0, 0, 1, 0);
-let entrance = newBlock(0, 0, 45, 35, "hole");
-let hole = newBlock(0, 474, 100, 0);
-let mirror = newBlock(0, 0, 50, 10, "mirror", 90);
-let portal = newBlock(0, 0, 69, 90, "portal");
+let platform1 = newBlock(-100, 0, 50, 10);
+let platform2 = newBlock(-100, 0, 50, 10);
+let wallL1 = newBlock(-100, 0, 10, 50);
+let wallL2 = newBlock(-100, 0, 10, 50);
+let wallC1 = newBlock(-100, 0, 0.01, 0);
+let wallC2 = newBlock(-100, 0, 0.01, 0);
+let entrance = newBlock(-100, 0, 45, 35, "hole");
+let hole = newBlock(-100, 474, 100, 0);
+let mirror = newBlock(-100, 0, 50, 10, "mirror", 90);
+let portal = newBlock(900, 380, 69, 90, "portal");
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
 
 function loop() {
-  if (screen === "title") {
-    // TITLE SCREEN
-
     // Play button
     ctx.fillStyle = "black";
     ctx.arc(500, 300, 30, 0, 2 * Math.PI);
     ctx.fill();
-
-    // Title
-    ctx.font = "100px  Arial";
-    ctx.fillStyle = "black";
-    ctx.fillText("Titre", 420, 100);
-  } else {
     // SET UP LEVEL
 
     // Draw background
@@ -180,6 +171,9 @@ function loop() {
     ctx.fillStyle = hole.c;
     ctx.fillRect(wallC1.x, wallC1.y, wallC1.w, wallC1.h);
     ctx.fillRect(wallC2.x, wallC2.y, wallC2.w, wallC2.h);
+    
+    // Hole
+    ctx.fillRect(hole.x, hole.y, hole.w, hole.h);
 
     // Mirror
     let mcx = mirror.x + 0.5 * mirror.w;
@@ -190,9 +184,6 @@ function loop() {
     ctx.translate(-mcx, -mcy);
     ctx.fillRect(mirror.x, mirror.y, mirror.w, mirror.h);
     ctx.restore();
-
-    // Hole
-    ctx.fillRect(hole.x, hole.y, hole.w, hole.h);
 
     // Portal
     ctx.drawImage(document.getElementById("portal"), portal.x, portal.y, portal.w, portal.h);
@@ -305,8 +296,15 @@ function loop() {
 
       function wallCollide(aWall) {
         if (char.x + char.w > aWall.x && char.x < aWall.x + aWall.w && char.y + char.h > aWall.y && char.y < aWall.y + aWall.h) {
-          if (aWall.action = "portal") {
-            screen = screen.replace("puzzle", "level");
+          if (aWall.a === "portal") {
+            screen = screen.replace("puzzle" && "title", "");
+            if (screen === NaN) {
+              levelNum = 0;
+            }
+            // ok
+            let levelNum = +screen;
+            levelNum++;
+            screen = "level" + levelNum;
             level1Setup();
             level2Setup();
             level3Setup();
@@ -378,12 +376,11 @@ function loop() {
         puzzle5Setup();
       }
     }
-  }
   requestAnimationFrame(loop);
 }
 
 function level1Setup() {
-  if (screen = "level1") {
+  if (screen === "level1") {
     background = document.getElementById("level1");
     hideAll();
     entrance.x = 549;
@@ -396,21 +393,21 @@ function level1Setup() {
 }
 
 function level2Setup() {
-  if (screen = "level2") {
+  if (screen === "level2") {
     background = document.getElementbyId("level2");
     hideAll();
   }
 }
 
 function level3Setup() {
-  if (screen = "level3") {
+  if (screen === "level3") {
     background = document.getElementbyId("level3");
     hideAll();
   }
 }
 
 function level4Setup() {
-  if (screen = "level4") {
+  if (screen === "level4") {
     background = document.getElementbyId("level4");
     hideAll();
     entrance.x = 549;
@@ -421,14 +418,14 @@ function level4Setup() {
 }
 
 function level5Setup() {
-  if (screen = "level5") {
+  if (screen === "level5") {
     background = document.getElementbyId("level5");
     hideAll();
   }
 }
 
 function puzzle1Setup() {
-  if (screen = "puzzle1") {
+  if (screen === "puzzle1") {
     background = document.getElementById("puzzle");
     openHole = false;
     entrance.x = -100;
@@ -438,29 +435,31 @@ function puzzle1Setup() {
     mirror.y = 444;
     portal.x = 900;
     portal.y = 380;
+    wallC1.x = -100;
+    wallC2.x = -100;
   }
 }
 
 function puzzle2Setup() {
-  if (screen = "puzzle2") {
+  if (screen === "puzzle2") {
 
   }
 }
 
 function puzzle3Setup() {
-  if (screen = "puzzle3") {
+  if (screen === "puzzle3") {
 
   }
 }
 
 function puzzle4Setup() {
-  if (screen = "puzzle4") {
+  if (screen === "puzzle4") {
 
   }
 }
 
 function puzzle5Setup() {
-  if (screen = "puzzle5") {
+  if (screen === "puzzle5") {
 
   }
 }
@@ -468,7 +467,7 @@ function puzzle5Setup() {
 function hideAll() {
   wallL1.x = -100;
   wallL2.x = -100;
-  wallC1.x = -100
+  wallC1.x = -100;
   wallC2.x = -100;
   mirror.x = -100;
   platform1.x = -100;
