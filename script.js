@@ -7,7 +7,7 @@ cnv.width = 1000;
 cnv.height = 600;
 
 // GLOBAL VARIABLES
-let screen = "title";
+let screen = "title0";
 let background = document.getElementById("title");;
 let openHole;
 let rightIsPressed = false;
@@ -38,37 +38,8 @@ let laser = {
 // EVENT LISTENERS
 document.addEventListener("keydown", keydownHandler);
 document.addEventListener("keyup", keyupHandler);
-document.addEventListener("click", startGame);
-document.addEventListener("mousemove", mousemoveHandler);
 
 // FUNCTIONS
-function startGame() {
-  if (screen === "title") {
-    if (distance < 30) {
-      screen = "level1";
-      level1Setup();
-      document.body.style.cursor = "default";
-    }
-  }
-
-}
-
-function mousemoveHandler(event) {
-  let cnvRect = cnv.getBoundingClientRect();
-  // console.log("x: " + (event.x - cnvRect.x), "y: " + (event.y - cnvRect.y));
-  if (screen === "title") {
-    let run = Math.abs(event.x - cnvRect.x - 500);
-    let rise = Math.abs(event.y - cnvRect.y - 300);
-    distance = Math.sqrt(run ** 2 + rise ** 2);
-
-    if (distance < 30) {
-      document.body.style.cursor = "pointer";
-    } else {
-      document.body.style.cursor = "default";
-    }
-  }
-}
-
 function keydownHandler(event) {
   if (event.code === "KeyE") {
     eIsPressed = true;
@@ -138,244 +109,237 @@ let portal = newBlock(900, 380, 69, 90, "portal");
 requestAnimationFrame(loop);
 
 function loop() {
-    // Play button
-    ctx.fillStyle = "black";
-    ctx.arc(500, 300, 30, 0, 2 * Math.PI);
-    ctx.fill();
-    // SET UP LEVEL
+  // Play button
+  ctx.fillStyle = "black";
+  ctx.arc(500, 300, 30, 0, 2 * Math.PI);
+  ctx.fill();
+  // SET UP LEVEL
 
-    // Draw background
-    ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
+  // Draw background
+  ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
 
-    // factory interior
-    if (background === document.getElementById("level4")) {
-      if (char.x < 200 && opacity < 10) {
-        opacity += 1;
-      } else if (char.x > 200 && opacity > 0) {
-        opacity -= 1;
-      }
-      ctx.globalAlpha = opacity / 10
-      ctx.drawImage(document.getElementById("factory-interior"), 0, 271, 200, 207);
-      ctx.globalAlpha = 1
+  // factory interior
+  if (background === document.getElementById("level4")) {
+    if (char.x < 200 && opacity < 10) {
+      opacity += 1;
+    } else if (char.x > 200 && opacity > 0) {
+      opacity -= 1;
     }
+    ctx.globalAlpha = opacity / 10
+    ctx.drawImage(document.getElementById("factory-interior"), 0, 271, 200, 207);
+    ctx.globalAlpha = 1
+  }
 
-    // Platforms
-    ctx.fillStyle = "blue";
-    ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
-    ctx.fillRect(platform2.x, platform2.y, platform2.w, platform2.h);
+  // Platforms
+  ctx.fillStyle = "blue";
+  ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
+  ctx.fillRect(platform2.x, platform2.y, platform2.w, platform2.h);
 
-    // Walls
-    ctx.fillRect(wallL1.x, wallL1.y, wallL1.w, wallL1.h);
-    ctx.fillRect(wallL2.x, wallL2.y, wallL2.w, wallL2.h);
-    ctx.fillRect(entrance.x, entrance.y, entrance.w, entrance.h);
-    ctx.fillStyle = hole.c;
-    ctx.fillRect(wallC1.x, wallC1.y, wallC1.w, wallC1.h);
-    ctx.fillRect(wallC2.x, wallC2.y, wallC2.w, wallC2.h);
-    
-    // Hole
-    ctx.fillRect(hole.x, hole.y, hole.w, hole.h);
+  // Walls
+  ctx.fillRect(wallL1.x, wallL1.y, wallL1.w, wallL1.h);
+  ctx.fillRect(wallL2.x, wallL2.y, wallL2.w, wallL2.h);
+  ctx.fillRect(entrance.x, entrance.y, entrance.w, entrance.h);
+  ctx.fillStyle = hole.c;
+  ctx.fillRect(wallC1.x, wallC1.y, wallC1.w, wallC1.h);
+  ctx.fillRect(wallC2.x, wallC2.y, wallC2.w, wallC2.h);
 
-    // Mirror
-    let mcx = mirror.x + 0.5 * mirror.w;
-    let mcy = mirror.y + 0.5 * mirror.h;
-    ctx.save();
-    ctx.translate(mcx, mcy);
-    ctx.rotate(mirror.r * Math.PI / 180);
-    ctx.translate(-mcx, -mcy);
-    ctx.fillRect(mirror.x, mirror.y, mirror.w, mirror.h);
-    ctx.restore();
+  // Hole
+  ctx.fillRect(hole.x, hole.y, hole.w, hole.h);
 
-    // Portal
-    ctx.drawImage(document.getElementById("portal"), portal.x, portal.y, portal.w, portal.h);
+  // Mirror
+  let mcx = mirror.x + 0.5 * mirror.w;
+  let mcy = mirror.y + 0.5 * mirror.h;
+  ctx.save();
+  ctx.translate(mcx, mcy);
+  ctx.rotate(mirror.r * Math.PI / 180);
+  ctx.translate(-mcx, -mcy);
+  ctx.fillRect(mirror.x, mirror.y, mirror.w, mirror.h);
+  ctx.restore();
 
-    // LASER
+  // Portal
+  ctx.drawImage(document.getElementById("portal"), portal.x, portal.y, portal.w, portal.h);
 
-    // Shoot laser
-    if (eIsPressed && laser.shoot === "ready") {
-      char.gravity = 1;
-      laser.width = 4;
-      laser.y = char.y + 12.5;
-      laser.shoot = true;
+  // LASER
+
+  // Shoot laser
+  if (eIsPressed && laser.shoot === "ready") {
+    char.gravity = 1;
+    laser.width = 4;
+    laser.y = char.y + 12.5;
+    laser.shoot = true;
+    if (char.facing === "right") {
+      laser.xMove = char.x + char.h;
+      laser.xLine = char.x + char.h;
+    } else {
+      laser.xMove = char.x;
+      laser.xLine = char.x;
+    }
+  }
+  if (laser.shoot === true) {
+    while (!laser.collide) {
+      // Laser moves left or right
       if (char.facing === "right") {
-        laser.xMove = char.x + char.h;
-        laser.xLine = char.x + char.h;
-      } else {
-        laser.xMove = char.x;
-        laser.xLine = char.x;
+        laser.xLine++;
       }
-    }
-    if (laser.shoot === true) {
-      while (!laser.collide) {
-        // Laser moves left or right
-        if (char.facing === "right") {
-          laser.xLine++;
-        }
-        if (char.facing === "left") {
-          laser.xLine--;
-        }
-
-        // Check collision
-        function wallCollide(aWall) {
-          if (laser.xLine > aWall.x && laser.xLine < aWall.x + aWall.w && laser.y > aWall.y && laser.y < aWall.y + aWall.h) {
-            laser.collide = true;
-            if (aWall.a === "hole") {
-              openHole = true;
-            }
-          }
-        }
-        wallCollide(wallL1);
-        wallCollide(wallL2);
-        wallCollide(entrance);
-
-        function mirrorCollide(aMirror) {
-          if (laser.xLine > aMirror.x && laser.xLine < aMirror.x + aMirror.w && laser.y > aMirror.y && laser.y < aMirror.y + aMirror.h) {
-            console.log("yee")
-            // mirror.x = 400;
-            // mirror.y = 444;
-            // 421
-            // 425
-          }
-        }
-        mirrorCollide(mirror);
-
-        if (laser.xLine < -1 || laser.xLine > cnv.width + 1) {
-          laser.collide = true;
-        }
+      if (char.facing === "left") {
+        laser.xLine--;
       }
 
-      // Draw laser
-      ctx.lineWidth = laser.width;
-      ctx.strokeStyle = "red";
-      ctx.beginPath();
-      ctx.moveTo(laser.xMove, laser.y);
-      ctx.lineTo(laser.xLine, laser.y);
-      ctx.stroke();
-    }
-    // Laser timer
-    if (laser.shoot != false && laser.shoot != "ready") {
-      laser.timer++;
-    }
-    if (laser.timer >= 25) {
-      laser.width -= 1;
-    }
-    if (laser.timer >= 30) {
-      laser.shoot = "cooldown";
-      laser.collide = false;
-    }
-    if (laser.timer >= 60) {
-      laser.shoot = "ready";
-      laser.timer = 0;
-    }
-
-    if (openHole) {
-      if (hole.h < cnv.height) {
-        hole.h += 4;
-      }
-      wallC1.x = hole.x;
-      wallC1.y = hole.y;
-      wallC1.h = hole.h;
-      wallC2.x = hole.x + 100;
-      wallC2.y = hole.y;
-      wallC2.h = hole.h;
-    }
-
-    // CHARACTER
-    ctx.fillStyle = "green";
-    ctx.fillRect(char.x, char.y, char.w, char.h);
-
-    // Move x
-    if (laser.shoot != true) {
-      if (rightIsPressed && !leftIsPressed) {
-        char.x += 5;
-        char.facing = "right";
-      }
-      if (leftIsPressed && !rightIsPressed) {
-        char.x -= 5;
-        char.facing = "left";
-      }
-
+      // Check collision
       function wallCollide(aWall) {
-        if (char.x + char.w > aWall.x && char.x < aWall.x + aWall.w && char.y + char.h > aWall.y && char.y < aWall.y + aWall.h) {
-          if (aWall.a === "portal") {
-            screen = screen.replace("puzzle" && "title", "");
-            if (screen === NaN) {
-              levelNum = 0;
-            }
-            // ok
-            let levelNum = +screen;
-            levelNum++;
-            screen = "level" + levelNum;
-            level1Setup();
-            level2Setup();
-            level3Setup();
-            level4Setup();
-            level5Setup();
-          } else if (char.facing === "right") {
-            char.x = aWall.x + aWall.w - char.w
-          } else if (char.facing === "left") {
-            char.x = aWall.x + aWall.w
+        if (laser.xLine > aWall.x && laser.xLine < aWall.x + aWall.w && laser.y > aWall.y && laser.y < aWall.y + aWall.h) {
+          laser.collide = true;
+          if (aWall.a === "hole") {
+            openHole = true;
           }
         }
       }
-      wallCollide(wallC1);
-      wallCollide(wallC2);
-      wallCollide(portal);
-    }
+      wallCollide(wallL1);
+      wallCollide(wallL2);
+      wallCollide(entrance);
 
-    // prevent character from going off screen
-    if (char.x < 0) {
-      char.x = 0;
-    }
-    if (char.x > cnv.width - char.w) {
-      char.x = cnv.width - char.w;
-    }
-
-    // Gravity
-    if (laser.shoot != true) {
-      // jump
-      char.y += char.gravity;
-      if (char.gravity < 8.5) {
-        char.gravity += 0.45;
-      }
-      if (upIsPressed && char.standing) {
-        char.standing = false;
-        char.y -= 8.5;
-        char.gravity = -8.5;
-      }
-
-      // check if standing on something
-      function platformCollide(aPlatform) {
-        if (char.x + char.w > aPlatform.x && char.x < (aPlatform.x + aPlatform.w) && char.y + char.w >= aPlatform.y && char.y + char.w <= (aPlatform.y + aPlatform.h)) {
-          char.y = aPlatform.y - char.w;
-          char.gravity = 0;
-          char.standing = true;
+      function mirrorCollide(aMirror) {
+        if (laser.xLine > aMirror.x && laser.xLine < aMirror.x + aMirror.w && laser.y > aMirror.y && laser.y < aMirror.y + aMirror.h) {
+          console.log("yee")
         }
       }
+      mirrorCollide(mirror);
 
-      if (char.x > hole.x && char.x < (hole.x + hole.w) && openHole) {
-        char.standing = false;
-        if (char.y >= hole.y + hole.h - char.h - 2) {
-          char.y = hole.y + hole.h - char.h;
+      if (laser.xLine < -1 || laser.xLine > cnv.width + 1) {
+        laser.collide = true;
+      }
+    }
+
+    // Draw laser
+    ctx.lineWidth = laser.width;
+    ctx.strokeStyle = "red";
+    ctx.beginPath();
+    ctx.moveTo(laser.xMove, laser.y);
+    ctx.lineTo(laser.xLine, laser.y);
+    ctx.stroke();
+  }
+  // Laser timer
+  if (laser.shoot != false && laser.shoot != "ready") {
+    laser.timer++;
+  }
+  if (laser.timer >= 25) {
+    laser.width -= 1;
+  }
+  if (laser.timer >= 30) {
+    laser.shoot = "cooldown";
+    laser.collide = false;
+  }
+  if (laser.timer >= 60) {
+    laser.shoot = "ready";
+    laser.timer = 0;
+  }
+
+  if (openHole) {
+    if (hole.h < cnv.height) {
+      hole.h += 4;
+    }
+    wallC1.x = hole.x;
+    wallC1.y = hole.y;
+    wallC1.h = hole.h;
+    wallC2.x = hole.x + 100;
+    wallC2.y = hole.y;
+    wallC2.h = hole.h;
+  }
+
+  // CHARACTER
+  ctx.fillStyle = "green";
+  ctx.fillRect(char.x, char.y, char.w, char.h);
+
+  // Move x
+  if (laser.shoot != true) {
+    if (rightIsPressed && !leftIsPressed) {
+      char.x += 5;
+      char.facing = "right";
+    }
+    if (leftIsPressed && !rightIsPressed) {
+      char.x -= 5;
+      char.facing = "left";
+    }
+
+    function wallCollide(aWall) {
+      if (char.x + char.w > aWall.x && char.x < aWall.x + aWall.w && char.y + char.h > aWall.y && char.y < aWall.y + aWall.h) {
+        if (aWall.a === "portal") {
+          screen = screen.replace(/puzzle|title/, "");
+          let levelNum = +screen;
+          levelNum++;
+          screen = "level" + levelNum;
+          level1Setup();
+          level2Setup();
+          level3Setup();
+          level4Setup();
+          level5Setup();
+        } else if (char.facing === "right") {
+          char.x = aWall.x + aWall.w - char.w
+        } else if (char.facing === "left") {
+          char.x = aWall.x + aWall.w
         }
-      } else if (char.y >= 449) {
-        char.standing = true;
+      }
+    }
+    wallCollide(wallC1);
+    wallCollide(wallC2);
+    wallCollide(portal);
+  }
+
+  // prevent character from going off screen
+  if (char.x < 0) {
+    char.x = 0;
+  }
+  if (char.x > cnv.width - char.w) {
+    char.x = cnv.width - char.w;
+  }
+
+  // Gravity
+  if (laser.shoot != true) {
+    // jump
+    char.y += char.gravity;
+    if (char.gravity < 8.5) {
+      char.gravity += 0.45;
+    }
+    if (upIsPressed && char.standing) {
+      char.standing = false;
+      char.y -= 8.5;
+      char.gravity = -8.5;
+    }
+
+    // check if standing on something
+    function platformCollide(aPlatform) {
+      if (char.x + char.w > aPlatform.x && char.x < aPlatform.x + aPlatform.w && char.y + char.w >= aPlatform.y && char.y + char.w <= (aPlatform.y + aPlatform.h)) {
+        char.y = aPlatform.y - char.w;
         char.gravity = 0;
-        char.y = 449;
-      } else if (char.gravity >= 0) {
-        char.standing = false;
-        platformCollide(platform1);
-        platformCollide(platform2);
-      }
-
-      if (char.y > cnv.height) {
-        screen = screen.replace("level", 'puzzle');
-        puzzle1Setup();
-        puzzle2Setup();
-        puzzle3Setup();
-        puzzle4Setup();
-        puzzle5Setup();
+        char.standing = true;
       }
     }
+
+    if (char.x > hole.x && char.x + char.w < hole.x + hole.w && openHole) {
+      char.standing = false;
+      if (char.y >= hole.y + hole.h - char.h - 2) {
+        char.y = hole.y + hole.h - char.h;
+      }
+    } else if (char.y >= 449) {
+      char.standing = true;
+      char.gravity = 0;
+      char.y = 449;
+    } else if (char.gravity >= 0) {
+      char.standing = false;
+      platformCollide(platform1);
+      platformCollide(platform2);
+    }
+
+    if (char.y > cnv.height) {
+      screen = screen.replace("level", 'puzzle');
+      puzzle1Setup();
+      puzzle2Setup();
+      puzzle3Setup();
+      puzzle4Setup();
+      puzzle5Setup();
+      openHole = false;
+    }
+  }
   requestAnimationFrame(loop);
 }
 
@@ -394,74 +358,108 @@ function level1Setup() {
 
 function level2Setup() {
   if (screen === "level2") {
-    background = document.getElementbyId("level2");
-    hideAll();
-  }
-}
-
-function level3Setup() {
-  if (screen === "level3") {
-    background = document.getElementbyId("level3");
-    hideAll();
-  }
-}
-
-function level4Setup() {
-  if (screen === "level4") {
-    background = document.getElementbyId("level4");
+    background = document.getElementById("level2");
     hideAll();
     entrance.x = 549;
     entrance.y = 386;
     entrance.w = 45.1;
     entrance.h = 50;
+    hole.x = 615;
+    hole.c = "#8d6e63";
+  }
+}
+
+function level3Setup() {
+  if (screen === "level3") {
+    background = document.getElementById("level3");
+    hideAll();
+    entrance.x = 549;
+    entrance.y = 386;
+    entrance.w = 45.1;
+    entrance.h = 50;
+    hole.x = 615;
+    hole.c = "#685a55";
+  }
+}
+
+function level4Setup() {
+  if (screen === "level4") {
+    background = document.getElementById("level4");
+    hideAll();
+    entrance.x = 549;
+    entrance.y = 386;
+    entrance.w = 45.1;
+    entrance.h = 50;
+    hole.x = 850;
+    hole.c = "#9e939e";
   }
 }
 
 function level5Setup() {
   if (screen === "level5") {
-    background = document.getElementbyId("level5");
+    background = document.getElementById("level5");
     hideAll();
+    entrance.x = 549;
+    entrance.y = 386;
+    entrance.w = 45.1;
+    entrance.h = 50;
+    hole.x = 200;
+    hole.c = "#5c5353";
   }
 }
 
 function puzzle1Setup() {
   if (screen === "puzzle1") {
-    background = document.getElementById("puzzle");
-    openHole = false;
-    entrance.x = -100;
+    puzzleSetup();
     hole.x = -100;
-    char.y = 0 - char.h;
     mirror.x = 400;
     mirror.y = 444;
     portal.x = 900;
     portal.y = 380;
-    wallC1.x = -100;
-    wallC2.x = -100;
   }
 }
 
 function puzzle2Setup() {
   if (screen === "puzzle2") {
-
+    puzzleSetup();
+    hole.x = -100;
+    portal.x = 900;
+    portal.y = 380;
   }
 }
 
 function puzzle3Setup() {
   if (screen === "puzzle3") {
-
+    puzzleSetup();
+    hole.x = -100;
+    portal.x = 900;
+    portal.y = 380;
   }
 }
 
 function puzzle4Setup() {
   if (screen === "puzzle4") {
-
+    puzzleSetup();
+    hole.x = -100;
+    portal.x = 900;
+    portal.y = 380;
   }
 }
 
 function puzzle5Setup() {
   if (screen === "puzzle5") {
-
+    puzzleSetup();
+    hole.x = -100;
+    portal.x = 900;
+    portal.y = 380;
   }
+}
+
+function puzzleSetup() {
+  background = document.getElementById("puzzle");
+  char.y = 0 - char.h;
+  hole.h = 0;
+  entrance.x = -100;
 }
 
 function hideAll() {
