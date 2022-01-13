@@ -8,6 +8,7 @@ cnv.height = 600;
 
 // GLOBAL VARIABLES
 let screen = "title0";
+let frameCount = 0;
 let background = document.getElementById("title");;
 let openHole;
 let rightIsPressed = false;
@@ -17,10 +18,12 @@ let upIsPressed = false;
 let distance;
 let opacity = 0;
 let char = {
+  imgX: 0,
+  imgY: 0,
   x: 500,
-  y: 449,
-  w: 25,
-  h: 25,
+  y: 474 - 54,
+  w: 24,
+  h: 69,
   facing: "right",
   gravity: 0,
   standing: true,
@@ -94,7 +97,7 @@ function newBlock(x, y, w, h, a, r, c) {
 }
 
 // Create objects
-let platform1 = newBlock(-100, 0, 50, 10);
+let platform1 = newBlock(-100, 400, 50, 10);
 let platform2 = newBlock(-100, 0, 50, 10);
 let wallL1 = newBlock(-100, 0, 10, 50);
 let wallL2 = newBlock(-100, 0, 10, 50);
@@ -109,6 +112,7 @@ let portal = newBlock(900, 380, 69, 90, "portal");
 requestAnimationFrame(loop);
 
 function loop() {
+  frameCount++;
   // Play button
   ctx.fillStyle = "black";
   ctx.arc(500, 300, 30, 0, 2 * Math.PI);
@@ -162,17 +166,35 @@ function loop() {
   // LASER
 
   // Shoot laser
+  if (laser.shoot === "animate") {
+    laser.shoot = true;
+  }
+
   if (eIsPressed && laser.shoot === "ready") {
+    laser.shoot = "animate";
     char.gravity = 1;
     laser.width = 4;
-    laser.y = char.y + 12.5;
-    laser.shoot = true;
-    if (char.facing === "right") {
-      laser.xMove = char.x + char.h;
-      laser.xLine = char.x + char.h;
+    if (rightIsPressed || leftIsPressed) {
+      laser.y = char.y + 37;
     } else {
-      laser.xMove = char.x;
-      laser.xLine = char.x;
+      laser.y = char.y + 34;
+    }
+    if (char.facing === "right") {
+      if (rightIsPressed) {
+        laser.xMove = char.x + char.w + 18;
+        laser.xLine = char.x + char.w + 18;
+      } else {
+        laser.xMove = char.x + char.w + 23;
+        laser.xLine = char.x + char.w + 23;
+      }
+    } else {
+      if (leftIsPressed) {
+        laser.xMove = char.x + 10;
+        laser.xLine = char.x + 10;
+      } else {
+        laser.xMove = char.x - 23;
+        laser.xLine = char.x - 23;
+      }
     }
   }
   if (laser.shoot === true) {
@@ -199,9 +221,7 @@ function loop() {
       wallCollide(entrance);
 
       function mirrorCollide(aMirror) {
-        if (laser.xLine > aMirror.x && laser.xLine < aMirror.x + aMirror.w && laser.y > aMirror.y && laser.y < aMirror.y + aMirror.h) {
-          console.log("yee")
-        }
+        if (laser.xLine > aMirror.x && laser.xLine < aMirror.x + aMirror.w && laser.y > aMirror.y && laser.y < aMirror.y + aMirror.h) {}
       }
       mirrorCollide(mirror);
 
@@ -219,7 +239,7 @@ function loop() {
     ctx.stroke();
   }
   // Laser timer
-  if (laser.shoot != false && laser.shoot != "ready") {
+  if (laser.shoot != "ready") {
     laser.timer++;
   }
   if (laser.timer >= 25) {
@@ -234,24 +254,54 @@ function loop() {
     laser.timer = 0;
   }
 
-  if (openHole) {
-    if (hole.h < cnv.height) {
-      hole.h += 4;
-    }
-    wallC1.x = hole.x;
-    wallC1.y = hole.y;
-    wallC1.h = hole.h;
-    wallC2.x = hole.x + 100;
-    wallC2.y = hole.y;
-    wallC2.h = hole.h;
-  }
-
   // CHARACTER
-  ctx.fillStyle = "green";
-  ctx.fillRect(char.x, char.y, char.w, char.h);
+  ctx.drawImage(document.getElementById("spritesheet"), char.imgX, char.imgY, 54, 56, char.x - 23, char.y - 2, 70.2, 72.8);
 
-  // Move x
+  // Animations
   if (laser.shoot != true) {
+    if (rightIsPressed) {
+      char.imgY = 0;
+      if (laser.shoot === "animate") {
+        char.imgX = 108;
+      } else {
+        if (frameCount % 20 === 0) {
+          if (char.imgX === 54) {
+            char.imgX = 0;
+          } else {
+            char.imgX = 54;
+          }
+        }
+      }
+    } else if (leftIsPressed) {
+      char.imgY = 56;
+      if (laser.shoot === "animate") {
+        char.imgX = 108;
+      } else {
+        if (frameCount % 20 === 0) {
+          if (char.imgX === 54) {
+            char.imgX = 0;
+          } else {
+            char.imgX = 54;
+          }
+        }
+      }
+    } else if (char.facing === "right") {
+      char.imgY = 112;
+      if (laser.shoot === "animate") {
+        char.imgX = 54;
+      } else {
+        char.imgX = 0;
+      }
+    } else if (char.facing === "left") {
+      char.imgY = 168;
+      if (laser.shoot === "animate") {
+        char.imgX = 54;
+      } else {
+        char.imgX = 0;
+      }
+    }
+
+    // Move x
     if (rightIsPressed && !leftIsPressed) {
       char.x += 5;
       char.facing = "right";
@@ -261,6 +311,9 @@ function loop() {
       char.facing = "left";
     }
 
+    // Collision
+
+    // wall
     function wallCollide(aWall) {
       if (char.x + char.w > aWall.x && char.x < aWall.x + aWall.w && char.y + char.h > aWall.y && char.y < aWall.y + aWall.h) {
         if (aWall.a === "portal") {
@@ -274,7 +327,7 @@ function loop() {
           level4Setup();
           level5Setup();
         } else if (char.facing === "right") {
-          char.x = aWall.x + aWall.w - char.w
+          char.x = aWall.x - char.w - 1;
         } else if (char.facing === "left") {
           char.x = aWall.x + aWall.w
         }
@@ -283,33 +336,11 @@ function loop() {
     wallCollide(wallC1);
     wallCollide(wallC2);
     wallCollide(portal);
-  }
 
-  // prevent character from going off screen
-  if (char.x < 0) {
-    char.x = 0;
-  }
-  if (char.x > cnv.width - char.w) {
-    char.x = cnv.width - char.w;
-  }
-
-  // Gravity
-  if (laser.shoot != true) {
-    // jump
-    char.y += char.gravity;
-    if (char.gravity < 8.5) {
-      char.gravity += 0.45;
-    }
-    if (upIsPressed && char.standing) {
-      char.standing = false;
-      char.y -= 8.5;
-      char.gravity = -8.5;
-    }
-
-    // check if standing on something
+    // platform
     function platformCollide(aPlatform) {
-      if (char.x + char.w > aPlatform.x && char.x < aPlatform.x + aPlatform.w && char.y + char.w >= aPlatform.y && char.y + char.w <= (aPlatform.y + aPlatform.h)) {
-        char.y = aPlatform.y - char.w;
+      if (char.x + char.w > aPlatform.x && char.x < aPlatform.x + aPlatform.w && char.y + char.h >= aPlatform.y && char.y + char.h <= aPlatform.y + aPlatform.h) {
+        char.y = aPlatform.y - char.h;
         char.gravity = 0;
         char.standing = true;
       }
@@ -320,16 +351,28 @@ function loop() {
       if (char.y >= hole.y + hole.h - char.h - 2) {
         char.y = hole.y + hole.h - char.h;
       }
-    } else if (char.y >= 449) {
+    } else if (char.y > 473 - char.h) {
+      char.y = 473 - char.h;
       char.standing = true;
       char.gravity = 0;
-      char.y = 449;
     } else if (char.gravity >= 0) {
       char.standing = false;
       platformCollide(platform1);
       platformCollide(platform2);
     }
 
+    // Gravity
+    char.y += char.gravity;
+    if (char.gravity < 8.5) {
+      char.gravity += 0.45;
+    }
+    if (upIsPressed && char.standing) {
+      char.standing = false;
+      char.y -= 8.5;
+      char.gravity = -8.5;
+    }
+
+    // Puzzle room
     if (char.y > cnv.height) {
       screen = screen.replace("level", 'puzzle');
       puzzle1Setup();
@@ -339,6 +382,27 @@ function loop() {
       puzzle5Setup();
       openHole = false;
     }
+  }
+
+  // prevent character from going off screen
+  if (char.x < 0) {
+    char.x = 0;
+  }
+  if (char.x > cnv.width - char.w) {
+    char.x = cnv.width - char.w;
+  }
+
+  // Hole
+  if (openHole) {
+    if (hole.h < cnv.height) {
+      hole.h += 4;
+    }
+    wallC1.x = hole.x;
+    wallC1.y = hole.y;
+    wallC1.h = hole.h;
+    wallC2.x = hole.x + 100;
+    wallC2.y = hole.y;
+    wallC2.h = hole.h;
   }
   requestAnimationFrame(loop);
 }
