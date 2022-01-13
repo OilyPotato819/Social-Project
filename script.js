@@ -179,22 +179,18 @@ function loop() {
     } else {
       laser.y = char.y + 34;
     }
-    if (char.facing === "right") {
-      if (rightIsPressed) {
-        laser.xMove = char.x + char.w + 18;
-        laser.xLine = char.x + char.w + 18;
-      } else {
-        laser.xMove = char.x + char.w + 23;
-        laser.xLine = char.x + char.w + 23;
-      }
-    } else {
-      if (leftIsPressed) {
-        laser.xMove = char.x + 10;
-        laser.xLine = char.x + 10;
-      } else {
-        laser.xMove = char.x - 23;
-        laser.xLine = char.x - 23;
-      }
+    if (char.imgY === 0) {
+      laser.xMove = char.x + char.w + 18;
+      laser.xLine = char.x + char.w + 18;
+    } else if (char.imgY === 112) {
+      laser.xMove = char.x + char.w + 23;
+      laser.xLine = char.x + char.w + 23;
+    } else if (char.imgY === 56) {
+      laser.xMove = char.x + 10;
+      laser.xLine = char.x + 10;
+    } else if (char.imgY === 168) {
+      laser.xMove = char.x - 23;
+      laser.xLine = char.x - 23;
     }
   }
   if (laser.shoot === true) {
@@ -261,10 +257,11 @@ function loop() {
   if (laser.shoot != true) {
     if (rightIsPressed) {
       char.imgY = 0;
+      char.imgX = 0;
       if (laser.shoot === "animate") {
         char.imgX = 108;
       } else {
-        if (frameCount % 20 === 0) {
+        if (frameCount % 10 === 0) {
           if (char.imgX === 54) {
             char.imgX = 0;
           } else {
@@ -274,10 +271,11 @@ function loop() {
       }
     } else if (leftIsPressed) {
       char.imgY = 56;
+      char.imgX = 0;
       if (laser.shoot === "animate") {
         char.imgX = 108;
       } else {
-        if (frameCount % 20 === 0) {
+        if (frameCount % 10 === 0) {
           if (char.imgX === 54) {
             char.imgX = 0;
           } else {
@@ -301,6 +299,7 @@ function loop() {
       }
     }
 
+
     // Move x
     if (rightIsPressed && !leftIsPressed) {
       char.x += 5;
@@ -310,6 +309,7 @@ function loop() {
       char.x -= 5;
       char.facing = "left";
     }
+
 
     // Collision
 
