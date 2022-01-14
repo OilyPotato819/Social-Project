@@ -97,7 +97,7 @@ function newBlock(x, y, w, h, a, r, c) {
 }
 
 // Create objects
-let platform1 = newBlock(-100, 400, 50, 10);
+let platform1 = newBlock(100, 400, 50, 10);
 let platform2 = newBlock(-100, 0, 50, 10);
 let wallL1 = newBlock(-100, 0, 10, 50);
 let wallL2 = newBlock(-100, 0, 10, 50);
@@ -257,21 +257,21 @@ function loop() {
   if (laser.shoot != true) {
     if (rightIsPressed) {
       char.imgY = 0;
-      char.imgX = 0;
       if (laser.shoot === "animate") {
         char.imgX = 108;
       } else {
         if (frameCount % 10 === 0) {
           if (char.imgX === 54) {
             char.imgX = 0;
+            console.log("yee1")
           } else {
+            console.log("yee")
             char.imgX = 54;
           }
         }
       }
     } else if (leftIsPressed) {
       char.imgY = 56;
-      char.imgX = 0;
       if (laser.shoot === "animate") {
         char.imgX = 108;
       } else {
@@ -298,7 +298,6 @@ function loop() {
         char.imgX = 0;
       }
     }
-
 
     // Move x
     if (rightIsPressed && !leftIsPressed) {
@@ -339,20 +338,20 @@ function loop() {
 
     // platform
     function platformCollide(aPlatform) {
-      if (char.x + char.w > aPlatform.x && char.x < aPlatform.x + aPlatform.w && char.y + char.h >= aPlatform.y && char.y + char.h <= aPlatform.y + aPlatform.h) {
-        char.y = aPlatform.y - char.h;
+      if (char.x + char.w > aPlatform.x && char.x < aPlatform.x + aPlatform.w && (char.y > aPlatform.y - 8 && char.y < aPlatform.y || char.y > aPlatform.y)) {
+        char.y = aPlatform.y;
         char.gravity = 0;
         char.standing = true;
       }
     }
-
+    console.log(char.y)
     if (char.x > hole.x && char.x + char.w < hole.x + hole.w && openHole) {
       char.standing = false;
       if (char.y >= hole.y + hole.h - char.h - 2) {
         char.y = hole.y + hole.h - char.h;
       }
-    } else if (char.y > 473 - char.h) {
-      char.y = 473 - char.h;
+    } else if (char.y > 396 && char.y < 404 || char.y > 404) {
+      char.y = 404;
       char.standing = true;
       char.gravity = 0;
     } else if (char.gravity >= 0) {
