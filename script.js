@@ -17,6 +17,7 @@ let eIsPressed = false;
 let upIsPressed = false;
 let distance;
 let opacity = 0;
+let mirrorCheck = 'ready'
 let char = {
   imgX: 0,
   imgY: 0,
@@ -43,6 +44,19 @@ document.addEventListener("keydown", keydownHandler);
 document.addEventListener("keyup", keyupHandler);
 
 // FUNCTIONS
+cnv.addEventListener("click", function (evt) {
+  var mousePos = getMousePos(cnv, evt);
+  console.log(mousePos.x + ',' + mousePos.y);
+}, false);
+
+function getMousePos(canvas, evt) {
+  var rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+}
+
 function keydownHandler(event) {
   if (event.code === "KeyE") {
     eIsPressed = true;
@@ -97,7 +111,7 @@ function newBlock(x, y, w, h, a, r, c) {
 }
 
 // Create objects
-let platform1 = newBlock(100, 400, 50, 10);
+let platform1 = newBlock(-100, 0, 50, 10);
 let platform2 = newBlock(-100, 0, 50, 10);
 let wallL1 = newBlock(-100, 0, 10, 50);
 let wallL2 = newBlock(-100, 0, 10, 50);
@@ -105,7 +119,7 @@ let wallC1 = newBlock(-100, 0, 0.01, 0);
 let wallC2 = newBlock(-100, 0, 0.01, 0);
 let entrance = newBlock(-100, 0, 45, 35, "hole");
 let hole = newBlock(-100, 474, 100, 0);
-let mirror = newBlock(-100, 0, 50, 10, "mirror", 90);
+let mirror = newBlock(700, 430, 50, 10, "mirror", 135);
 let portal = newBlock(900, 380, 69, 90, "portal");
 
 // MAIN PROGRAM LOOP
@@ -217,9 +231,17 @@ function loop() {
       wallCollide(entrance);
 
       function mirrorCollide(aMirror) {
-        if (laser.xLine > aMirror.x && laser.xLine < aMirror.x + aMirror.w && laser.y > aMirror.y && laser.y < aMirror.y + aMirror.h) {}
+        if (mirror.r === 135) {
+          for (let checkY = mirror.y - 20, checkX = mirror.x; checkY <= mirror.y + 50; checkY++) {
+            checkX--;
+            console.log('checkX: ' + checkX, 'checkY: ' + checkY)
+          }
+        }
       }
-      mirrorCollide(mirror);
+      if (mirrorCheck === 'ready') {
+        mirrorCollide(mirror);
+        mirrorCheck = 'done'
+      }
 
       if (laser.xLine < -1 || laser.xLine > cnv.width + 1) {
         laser.collide = true;
@@ -234,6 +256,19 @@ function loop() {
     ctx.lineTo(laser.xLine, laser.y);
     ctx.stroke();
   }
+
+  ctx.strokeStyle = "blue";
+  ctx.beginPath();
+  ctx.moveTo(700, mirror.y - 15);
+  ctx.lineTo(700, mirror.y + 50);
+  ctx.stroke();
+
+  ctx.strokeStyle = "blue";
+  ctx.beginPath();
+  ctx.moveTo(700, mirror.y - 15);
+  ctx.lineTo(mirror.x, mirror.y - 15);
+  ctx.stroke();
+
   // Laser timer
   if (laser.shoot != "ready") {
     laser.timer++;
@@ -255,6 +290,7 @@ function loop() {
 
   // Animations
   if (laser.shoot != true) {
+    mirrorCheck === 'ready';
     if (rightIsPressed) {
       char.imgY = 0;
       if (laser.shoot === "animate") {
@@ -263,9 +299,7 @@ function loop() {
         if (frameCount % 10 === 0) {
           if (char.imgX === 54) {
             char.imgX = 0;
-            console.log("yee1")
           } else {
-            console.log("yee")
             char.imgX = 54;
           }
         }
@@ -338,19 +372,18 @@ function loop() {
 
     // platform
     function platformCollide(aPlatform) {
-      if (char.x + char.w > aPlatform.x && char.x < aPlatform.x + aPlatform.w && (char.y > aPlatform.y - 8 && char.y < aPlatform.y || char.y > aPlatform.y)) {
-        char.y = aPlatform.y;
+      if (char.x + char.w > aPlatform.x && char.x < aPlatform.x + aPlatform.w && char.y + char.h > aPlatform.y - 7 && char.y + char.h < aPlatform.y + aPlatform.h && char.y != aPlatform.y - char.h) {
+        char.y = aPlatform.y - char.h;
         char.gravity = 0;
         char.standing = true;
       }
     }
-    console.log(char.y)
     if (char.x > hole.x && char.x + char.w < hole.x + hole.w && openHole) {
       char.standing = false;
       if (char.y >= hole.y + hole.h - char.h - 2) {
         char.y = hole.y + hole.h - char.h;
       }
-    } else if (char.y > 396 && char.y < 404 || char.y > 404) {
+    } else if (char.y > 396 && char.y != 404) {
       char.y = 404;
       char.standing = true;
       char.gravity = 0;
