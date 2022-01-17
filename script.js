@@ -17,11 +17,11 @@ let eIsPressed = false;
 let upIsPressed = false;
 let distance;
 let opacity = 0;
-let mirrorCheck = 'ready'
+let checkMirrors = 'ready';
 let char = {
   imgX: 0,
   imgY: 0,
-  x: 500,
+  x: 850,
   y: 474 - 54,
   w: 24,
   h: 69,
@@ -97,20 +97,19 @@ function keyupHandler(event) {
 
 // CREATE LEVEL OBJECTS
 
-// Platform function
-function newBlock(x, y, w, h, a, r, c) {
+// Block function
+function newBlock(x, y, w, h, a, col) {
   return {
     x: x,
     y: y,
     w: w,
     h: h,
     a: a,
-    r: r,
-    c: c,
+    col: col,
   }
 }
 
-// Create objects
+// Create blocks
 let platform1 = newBlock(-100, 0, 50, 10);
 let platform2 = newBlock(-100, 0, 50, 10);
 let wallL1 = newBlock(-100, 0, 10, 50);
@@ -119,8 +118,30 @@ let wallC1 = newBlock(-100, 0, 0.01, 0);
 let wallC2 = newBlock(-100, 0, 0.01, 0);
 let entrance = newBlock(-100, 0, 45, 35, "hole");
 let hole = newBlock(-100, 474, 100, 0);
-let mirror = newBlock(700, 430, 50, 10, "mirror", 135);
 let portal = newBlock(900, 380, 69, 90, "portal");
+let dialogueBox1 = newBlock(0, 0, 0, 0, "dialogue");
+let dialogueBox2 = newBlock(0, 0, 0, 0, "dialogue");
+
+// Mirror function
+function newMirror(x1, y1, a, r, checkCoordinates, x2, y2, cor1x, cor1y, cor2x, cor2y, ) {
+  return {
+    x1: x1,
+    y1: y1,
+    a: a,
+    r: r,
+    checkCoordinates: checkCoordinates,
+    x2: x2,
+    y2: y2,
+    cor1x: cor1x,
+    cor1y: cor1y,
+    cor2x: cor2x,
+    cor2y: cor2y,
+  }
+}
+
+// Create mirror
+let mirror1 = newMirror(700, 400, "mirror", 135, '', '');
+let mirror2 = newMirror(600, 400, "mirror", 45, '', '');
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
@@ -148,6 +169,10 @@ function loop() {
     ctx.globalAlpha = 1
   }
 
+  ctx.strokeStyle = "black";
+  ctx.strokeRect(dialogueBox1.x, dialogueBox1.y, dialogueBox1.w, dialogueBox1.h);
+  ctx.strokeRect(dialogueBox2.x, dialogueBox2.y, dialogueBox2.w, dialogueBox2.h);
+
   // Platforms
   ctx.fillStyle = "blue";
   ctx.fillRect(platform1.x, platform1.y, platform1.w, platform1.h);
@@ -165,14 +190,35 @@ function loop() {
   ctx.fillRect(hole.x, hole.y, hole.w, hole.h);
 
   // Mirror
-  let mcx = mirror.x + 0.5 * mirror.w;
-  let mcy = mirror.y + 0.5 * mirror.h;
-  ctx.save();
-  ctx.translate(mcx, mcy);
-  ctx.rotate(mirror.r * Math.PI / 180);
-  ctx.translate(-mcx, -mcy);
-  ctx.fillRect(mirror.x, mirror.y, mirror.w, mirror.h);
-  ctx.restore();
+  mirror1.x2 = mirror1.x1 + 6.5;
+  mirror1.y2 = mirror1.y1 + 6.5;
+  mirror1.cor1x = mirror1.x1 - 35;
+  mirror1.cor1y = mirror1.y1 + 35;
+  mirror1.cor2x = mirror1.cor1x + 6.5;
+  mirror1.cor2y = mirror1.cor1y + 6.5;
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.moveTo(mirror1.x1, mirror1.y1);
+  ctx.lineTo(mirror1.cor1x, mirror1.cor1y);
+  ctx.lineTo(mirror1.cor2x, mirror1.cor2y);
+  ctx.lineTo(mirror1.x2, mirror1.y2);
+  ctx.closePath();
+  ctx.fill();
+
+  mirror2.x2 = mirror2.x1 - 6.5;
+  mirror2.y2 = mirror2.y1 + 6.5;
+  mirror2.cor1x = mirror2.x1 + 35;
+  mirror2.cor1y = mirror2.y1 + 35;
+  mirror2.cor2x = mirror2.cor1x - 6.5;
+  mirror2.cor2y = mirror2.cor1y + 6.5;
+  ctx.fillStyle = "red";
+  ctx.beginPath();
+  ctx.moveTo(mirror2.x1, mirror2.y1);
+  ctx.lineTo(mirror2.cor1x, mirror2.cor1y);
+  ctx.lineTo(mirror2.cor2x, mirror2.cor2y);
+  ctx.lineTo(mirror2.x2, mirror2.y2);
+  ctx.closePath();
+  ctx.fill();
 
   // Portal
   ctx.drawImage(document.getElementById("portal"), portal.x, portal.y, portal.w, portal.h);
@@ -182,11 +228,6 @@ function loop() {
   // Shoot laser
   if (laser.shoot === "animate") {
     laser.shoot = true;
-  }
-
-  if (eIsPressed && laser.shoot === "ready") {
-    laser.shoot = "animate";
-    char.gravity = 1;
     laser.width = 4;
     if (rightIsPressed || leftIsPressed) {
       laser.y = char.y + 37;
@@ -207,8 +248,18 @@ function loop() {
       laser.xLine = char.x - 23;
     }
   }
+
+  if (eIsPressed && laser.shoot === "ready") {
+    laser.shoot = "animate";
+    char.gravity = 0;
+  }
+
   if (laser.shoot === true) {
     while (!laser.collide) {
+      if (checkMirrors === 'ready') {
+        checkMirrors = true;
+        mirrorCollide(mirror1);
+      }
       // Laser moves left or right
       if (char.facing === "right") {
         laser.xLine++;
@@ -218,6 +269,35 @@ function loop() {
       }
 
       // Check collision
+
+      // mirror collision
+      let searchFor = '|' + parseInt(laser.xLine) + ', ' + parseInt(laser.y) + "|";
+      mirror1.checkCoordinates = mirror1.checkCoordinates.replace(searchFor, "|match|");
+      console.log(mirror1.checkCoordinates)
+      if (mirror1.checkCoordinates.includes('match')) {
+        laser.collide = true;
+        laser.xLine += 1;
+      }
+
+      function mirrorCollide(aMirror) {
+        if (aMirror.r === 135) {
+          for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
+            aMirror.checkCoordinates += '|' + checkX + ', ' + checkY + '|';
+            checkX--;
+          }
+        }
+        if (aMirror.r === 45) {
+          for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor2y; checkY++) {
+            console.log("mirror2| " + 'checkX: ' + checkX, 'checkY: ' + checkY)
+            if (laser.xLine === checkX && laser.y === checkY) {
+              laser.collide = true;
+            }
+            checkX--;
+          }
+        }
+      }
+
+      // walls
       function wallCollide(aWall) {
         if (laser.xLine > aWall.x && laser.xLine < aWall.x + aWall.w && laser.y > aWall.y && laser.y < aWall.y + aWall.h) {
           laser.collide = true;
@@ -229,19 +309,6 @@ function loop() {
       wallCollide(wallL1);
       wallCollide(wallL2);
       wallCollide(entrance);
-
-      function mirrorCollide(aMirror) {
-        if (mirror.r === 135) {
-          for (let checkY = mirror.y - 20, checkX = mirror.x; checkY <= mirror.y + 50; checkY++) {
-            checkX--;
-            console.log('checkX: ' + checkX, 'checkY: ' + checkY)
-          }
-        }
-      }
-      if (mirrorCheck === 'ready') {
-        mirrorCollide(mirror);
-        mirrorCheck = 'done'
-      }
 
       if (laser.xLine < -1 || laser.xLine > cnv.width + 1) {
         laser.collide = true;
@@ -256,18 +323,6 @@ function loop() {
     ctx.lineTo(laser.xLine, laser.y);
     ctx.stroke();
   }
-
-  ctx.strokeStyle = "blue";
-  ctx.beginPath();
-  ctx.moveTo(700, mirror.y - 15);
-  ctx.lineTo(700, mirror.y + 50);
-  ctx.stroke();
-
-  ctx.strokeStyle = "blue";
-  ctx.beginPath();
-  ctx.moveTo(700, mirror.y - 15);
-  ctx.lineTo(mirror.x, mirror.y - 15);
-  ctx.stroke();
 
   // Laser timer
   if (laser.shoot != "ready") {
@@ -286,11 +341,14 @@ function loop() {
   }
 
   // CHARACTER
-  ctx.drawImage(document.getElementById("spritesheet"), char.imgX, char.imgY, 54, 56, char.x - 23, char.y - 2, 70.2, 72.8);
+  ctx.drawImage(document.getElementById("spritesheet"), char.imgX, char.imgY, 54, 56, char.x - 23, char.y - 2, 70, 72);
 
-  // Animations
   if (laser.shoot != true) {
-    mirrorCheck === 'ready';
+    // Reset checkMirrors
+    checkMirrors = 'ready'
+    mirror1.checkCoordinates = '';
+
+    // Animations
     if (rightIsPressed) {
       char.imgY = 0;
       if (laser.shoot === "animate") {
@@ -359,6 +417,8 @@ function loop() {
           level3Setup();
           level4Setup();
           level5Setup();
+        } else if (aWall.a === "dialogue") {
+          console.log("grog");
         } else if (char.facing === "right") {
           char.x = aWall.x - char.w - 1;
         } else if (char.facing === "left") {
@@ -369,6 +429,8 @@ function loop() {
     wallCollide(wallC1);
     wallCollide(wallC2);
     wallCollide(portal);
+    wallCollide(dialogueBox1);
+    wallCollide(dialogueBox2);
 
     // platform
     function platformCollide(aPlatform) {
@@ -385,8 +447,8 @@ function loop() {
       }
     } else if (char.y > 396 && char.y != 404) {
       char.y = 404;
-      char.standing = true;
       char.gravity = 0;
+      char.standing = true;
     } else if (char.gravity >= 0) {
       char.standing = false;
       platformCollide(platform1);
@@ -448,7 +510,15 @@ function level1Setup() {
     entrance.w = 45.1;
     entrance.h = 50;
     hole.x = 920;
-    hole.c = "#ffeb3b";
+    hole.col = "#ffeb3b";
+    dialogueBox1.x = 750;
+    dialogueBox1.y = 400;
+    dialogueBox1.w = 50;
+    dialogueBox1.h = 50;
+    dialogueBox2.x = 650;
+    dialogueBox2.y = 400;
+    dialogueBox2.w = 50;
+    dialogueBox2.h = 50;
   }
 }
 
@@ -461,7 +531,7 @@ function level2Setup() {
     entrance.w = 45.1;
     entrance.h = 50;
     hole.x = 615;
-    hole.c = "#8d6e63";
+    hole.col = "#8d6e63";
   }
 }
 
@@ -474,7 +544,7 @@ function level3Setup() {
     entrance.w = 45.1;
     entrance.h = 50;
     hole.x = 615;
-    hole.c = "#685a55";
+    hole.col = "#685a55";
   }
 }
 
@@ -487,7 +557,7 @@ function level4Setup() {
     entrance.w = 45.1;
     entrance.h = 50;
     hole.x = 850;
-    hole.c = "#9e939e";
+    hole.col = "#9e939e";
   }
 }
 
@@ -500,7 +570,7 @@ function level5Setup() {
     entrance.w = 45.1;
     entrance.h = 50;
     hole.x = 200;
-    hole.c = "#5c5353";
+    hole.col = "#5c5353";
   }
 }
 
@@ -508,8 +578,8 @@ function puzzle1Setup() {
   if (screen === "puzzle1") {
     puzzleSetup();
     hole.x = -100;
-    mirror.x = 400;
-    mirror.y = 444;
+    mirror1.x1 = 400;
+    mirror1.y1 = 444;
     portal.x = 900;
     portal.y = 380;
   }
@@ -563,7 +633,7 @@ function hideAll() {
   wallL2.x = -100;
   wallC1.x = -100;
   wallC2.x = -100;
-  mirror.x = -100;
+  mirror1.x1 = -100;
   platform1.x = -100;
   platform2.x = -100;
   portal.x = -100;
