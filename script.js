@@ -123,13 +123,13 @@ let dialogueBox1 = newBlock(0, 0, 0, 0, "dialogue");
 let dialogueBox2 = newBlock(0, 0, 0, 0, "dialogue");
 
 // Mirror function
-function newMirror(x1, y1, a, r, checkCoordinates, x2, y2, cor1x, cor1y, cor2x, cor2y, ) {
+function newMirror(x1, y1, a, r, coord, x2, y2, cor1x, cor1y, cor2x, cor2y, ) {
   return {
     x1: x1,
     y1: y1,
     a: a,
     r: r,
-    checkCoordinates: checkCoordinates,
+    coord: coord,
     x2: x2,
     y2: y2,
     cor1x: cor1x,
@@ -196,7 +196,7 @@ function loop() {
   mirror1.cor1y = mirror1.y1 + 35;
   mirror1.cor2x = mirror1.cor1x + 6.5;
   mirror1.cor2y = mirror1.cor1y + 6.5;
-  ctx.fillStyle = "red";
+  ctx.fillStyle = "blue";
   ctx.beginPath();
   ctx.moveTo(mirror1.x1, mirror1.y1);
   ctx.lineTo(mirror1.cor1x, mirror1.cor1y);
@@ -211,7 +211,6 @@ function loop() {
   mirror2.cor1y = mirror2.y1 + 35;
   mirror2.cor2x = mirror2.cor1x - 6.5;
   mirror2.cor2y = mirror2.cor1y + 6.5;
-  ctx.fillStyle = "red";
   ctx.beginPath();
   ctx.moveTo(mirror2.x1, mirror2.y1);
   ctx.lineTo(mirror2.cor1x, mirror2.cor1y);
@@ -258,7 +257,8 @@ function loop() {
     while (!laser.collide) {
       if (checkMirrors === 'ready') {
         checkMirrors = true;
-        mirrorCollide(mirror1);
+        getCoordinates(mirror1);
+        getCoordinates(mirror2);
       }
       // Laser moves left or right
       if (char.facing === "right") {
@@ -271,28 +271,32 @@ function loop() {
       // Check collision
 
       // mirror collision
-      let searchFor = '|' + parseInt(laser.xLine) + ', ' + parseInt(laser.y) + "|";
-      mirror1.checkCoordinates = mirror1.checkCoordinates.replace(searchFor, "|match|");
-      console.log(mirror1.checkCoordinates)
-      if (mirror1.checkCoordinates.includes('match')) {
-        laser.collide = true;
-        laser.xLine += 1;
-      }
-
-      function mirrorCollide(aMirror) {
-        if (aMirror.r === 135) {
-          for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
-            aMirror.checkCoordinates += '|' + checkX + ', ' + checkY + '|';
-            checkX--;
+      function mirrorCollision(aMirror) {
+        let searchFor = '|' + parseInt(laser.xLine) + ', ' + parseInt(laser.y) + "|";
+        aMirror.coord = aMirror.coord.replace(searchFor, "|match|");
+        console.log(aMirror.coord)
+        if (aMirror.coord.includes('match')) {
+          laser.collide = true;
+          if (aMirror.r === 45) {
+            laser.xLine -= 1;
+          } else {
+            laser.xLine += 1;
           }
         }
-        if (aMirror.r === 45) {
-          for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor2y; checkY++) {
-            console.log("mirror2| " + 'checkX: ' + checkX, 'checkY: ' + checkY)
-            if (laser.xLine === checkX && laser.y === checkY) {
-              laser.collide = true;
-            }
+      }
+      mirrorCollision(mirror1);
+      mirrorCollision(mirror2);
+
+      function getCoordinates(aMirror) {
+        if (aMirror.r === 135) {
+          for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
+            aMirror.coord += '|' + checkX + ', ' + checkY + '|';
             checkX--;
+          }
+        } else if (aMirror.r === 45) {
+          for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
+            aMirror.coord += '|' + checkX + ', ' + checkY + '|';
+            checkX++;
           }
         }
       }
@@ -346,7 +350,8 @@ function loop() {
   if (laser.shoot != true) {
     // Reset checkMirrors
     checkMirrors = 'ready'
-    mirror1.checkCoordinates = '';
+    mirror1.coord = '';
+    mirror2.coord = '';
 
     // Animations
     if (rightIsPressed) {
