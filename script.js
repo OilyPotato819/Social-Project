@@ -140,8 +140,8 @@ function newMirror(x1, y1, a, r, coord, x2, y2, cor1x, cor1y, cor2x, cor2y, ) {
 }
 
 // Create mirror
-let mirror1 = newMirror(700, 400, "mirror", 135, '', '');
-let mirror2 = newMirror(600, 400, "mirror", 45, '', '');
+let mirror1 = newMirror(-700, 400, "mirror", 135, '', '');
+let mirror2 = newMirror(-600, 400, "mirror", 45, '', '');
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
