@@ -30,6 +30,7 @@ let char = {
   standing: true,
 };
 let laser = {
+  origin: 0,
   xMove: 0,
   xLine: 0,
   y: 0,
@@ -119,8 +120,7 @@ let wallC2 = newBlock(-100, 0, 0.01, 0);
 let entrance = newBlock(-100, 0, 45, 35, 'hole');
 let hole = newBlock(-100, 474, 100, 0);
 let portal = newBlock(900, 380, 69, 90, 'portal');
-let dialogueBox1 = newBlock(0, 0, 0, 0, 'dialogue');
-let dialogueBox2 = newBlock(0, 0, 0, 0, 'dialogue');
+let dialogueBox = newBlock(0, 0, 0, 0, 'dialogue');
 
 // Mirror function
 function newMirror(x1, y1, a, r, coords, x2, y2, cor1x, cor1y, cor2x, cor2y, ) {
@@ -170,8 +170,7 @@ function loop() {
   }
 
   ctx.strokeStyle = 'black';
-  ctx.strokeRect(dialogueBox1.x, dialogueBox1.y, dialogueBox1.w, dialogueBox1.h);
-  ctx.strokeRect(dialogueBox2.x, dialogueBox2.y, dialogueBox2.w, dialogueBox2.h);
+  ctx.strokeRect(dialogueBox.x, dialogueBox.y, dialogueBox.w, dialogueBox.h);
 
   // Platforms
   ctx.fillStyle = 'blue';
@@ -201,20 +200,16 @@ function loop() {
     if (rightIsPressed || leftIsPressed) {
       laser.y = char.y + 37;
     } else {
-      laser.y = char.y + 34;
-    }
+      laser.y = char.y + 34; // 
+    } // 
     if (char.imgY === 0) {
-      laser.xMove = char.x + char.w + 18;
-      laser.xLine = char.x + char.w + 18;
+      laser.origin = char.x + char.w + 13;
     } else if (char.imgY === 112) {
-      laser.xMove = char.x + char.w + 23;
-      laser.xLine = char.x + char.w + 23;
+      laser.origin = char.x + char.w + 23;
     } else if (char.imgY === 56) {
-      laser.xMove = char.x + 10;
-      laser.xLine = char.x + 10;
+      laser.origin = char.x - 13;
     } else if (char.imgY === 168) {
-      laser.xMove = char.x - 23;
-      laser.xLine = char.x - 23;
+      laser.origin = char.x - 23;
     }
   }
 
@@ -224,68 +219,28 @@ function loop() {
   }
 
   if (laser.shoot === true) {
+    laser.xMove = laser.origin;
+    laser.xLine = laser.origin;
     while (!laser.collide) {
       if (checkMirrors === 'ready') {
         getCoordinates(mirror1);
         getCoordinates(mirror2);
       }
+
       // Laser moves left or right
       if (char.facing === 'right') {
+        laser.xMove = laser.xLine;
         laser.xLine++;
       }
       if (char.facing === 'left') {
+        laser.xMove = laser.xLine;
         laser.xLine--;
       }
 
       // Check collision
-
-      // mirror collision
-      function mirrorCollision(aMirror) {
-        let searchFor = '|' + parseInt(laser.xLine) + ',' + parseInt(laser.y) + '|';
-        aMirror.coords = aMirror.coords.replace(searchFor, '|match|');
-        if (aMirror.coords.includes('match')) {
-          laser.collide = 'bounce';
-        }
-      }
       mirrorCollision(mirror1);
       mirrorCollision(mirror2);
 
-      function getCoordinates(aMirror) {
-        checkMirrors = true;
-        aMirror.coords += '///coords1///'
-        if (aMirror.r === 135) {
-          for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
-            aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
-            checkX--;
-          }
-          aMirror.coords += '///coords2///'
-          for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.cor2y; checkY++) {
-            aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
-            checkX--;
-          }
-        } else if (aMirror.r === 45) {
-          for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
-            aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
-            checkX++;
-          }
-          aMirror.coords += '///coords2///'
-          for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.cor2y; checkY++) {
-            aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
-            checkX++;
-          }
-        }
-        console.log(aMirror.coords)
-      }
-
-      // walls
-      function wallCollide(aWall) {
-        if (laser.xLine > aWall.x && laser.xLine < aWall.x + aWall.w && laser.y > aWall.y && laser.y < aWall.y + aWall.h) {
-          laser.collide = true;
-          if (aWall.a === 'hole') {
-            openHole = true;
-          }
-        }
-      }
       wallCollide(wallL1);
       wallCollide(wallL2);
       wallCollide(entrance);
@@ -293,18 +248,62 @@ function loop() {
       if (laser.xLine < -1 || laser.xLine > cnv.width + 1) {
         laser.collide = true;
       }
-    }
 
-    // Draw laser
-    ctx.lineWidth = laser.width;
-    ctx.strokeStyle = 'red';
-    ctx.beginPath();
-    ctx.moveTo(laser.xMove, laser.y);
-    ctx.lineTo(laser.xLine, laser.y);
-    if (laser.collide === 'bounce') {
+      // Draw laser
+      ctx.lineWidth = laser.width;
+      ctx.strokeStyle = 'red';
+      ctx.beginPath();
+      ctx.moveTo(laser.xMove, laser.y);
       ctx.lineTo(laser.xLine, laser.y);
+      ctx.stroke();
     }
-    ctx.stroke();
+  }
+
+  function getCoordinates(aMirror) {
+    checkMirrors = true;
+    aMirror.coords += '///coords1///'
+    if (aMirror.r === 135) {
+      for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
+        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        checkX--;
+      }
+      aMirror.coords += '///coords2///'
+      for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.cor2y; checkY++) {
+        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        checkX--;
+      }
+    } else if (aMirror.r === 45) {
+      for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
+        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        checkX++;
+      }
+      aMirror.coords += '///coords2///'
+      for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.cor2y; checkY++) {
+        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        checkX++;
+      }
+    }
+  }
+
+  function mirrorCollision(aMirror) {
+    let searchFor = '|' + parseInt(laser.xLine) + ',' + parseInt(laser.y) + '|';
+    aMirror.coords = aMirror.coords.replace(searchFor, '|match|');
+    if (aMirror.coords.includes('match')) {
+      laser.collide = true;
+      laser.xMove = laser.origin;
+      laser.xLine = laser.origin;
+    }
+  }
+
+  function wallCollide(aWall) {
+    if (laser.xLine > aWall.x && laser.xLine < aWall.x + aWall.w && laser.y > aWall.y && laser.y < aWall.y + aWall.h) {
+      laser.collide = true;
+      if (aWall.a === 'hole') {
+        openHole = true;
+      }
+      laser.xMove = laser.origin;
+      laser.xLine = laser.origin;
+    }
   }
 
   // Laser timer
@@ -326,7 +325,7 @@ function loop() {
   // Draw mirrors
   ctx.lineWidth = 1;
   ctx.strokeStyle = 'black';
-  
+
   mirror1.x2 = mirror1.x1 + 6.5;
   mirror1.y2 = mirror1.y1 + 6.5;
   mirror1.cor1x = mirror1.x1 - 35;
@@ -446,8 +445,7 @@ function loop() {
     wallCollide(wallC1);
     wallCollide(wallC2);
     wallCollide(portal);
-    wallCollide(dialogueBox1);
-    wallCollide(dialogueBox2);
+    wallCollide(dialogueBox);
 
     // platform
     function platformCollide(aPlatform) {
@@ -529,14 +527,10 @@ function level1Setup() {
     entrance.h = 50;
     hole.x = 920;
     hole.col = '#ffeb3b';
-    dialogueBox1.x = 750;
-    dialogueBox1.y = 400;
-    dialogueBox1.w = 50;
-    dialogueBox1.h = 50;
-    dialogueBox2.x = 650;
-    dialogueBox2.y = 400;
-    dialogueBox2.w = 50;
-    dialogueBox2.h = 50;
+    dialogueBox.x = 430;
+    dialogueBox.y = 400;
+    dialogueBox.w = 75;
+    dialogueBox.h = 50;
   }
 }
 
@@ -550,6 +544,10 @@ function level2Setup() {
     entrance.h = 50;
     hole.x = 615;
     hole.col = '#8d6e63';
+    dialogueBox.x = 350;
+    dialogueBox.y = 400;
+    dialogueBox.w = 75;
+    dialogueBox.h = 50;
   }
 }
 
@@ -563,6 +561,10 @@ function level3Setup() {
     entrance.h = 50;
     hole.x = 615;
     hole.col = '#685a55';
+    dialogueBox.x = 550;
+    dialogueBox.y = 400;
+    dialogueBox.w = 75;
+    dialogueBox.h = 50;
   }
 }
 
@@ -576,6 +578,10 @@ function level4Setup() {
     entrance.h = 50;
     hole.x = 850;
     hole.col = '#9e939e';
+    dialogueBox.x = 1200;
+    dialogueBox.y = 400;
+    dialogueBox.w = 75;
+    dialogueBox.h = 50;
   }
 }
 
@@ -589,6 +595,10 @@ function level5Setup() {
     entrance.h = 50;
     hole.x = 200;
     hole.col = '#5c5353';
+    dialogueBox.x = 100;
+    dialogueBox.y = 400;
+    dialogueBox.w = 75;
+    dialogueBox.h = 50;
   }
 }
 
