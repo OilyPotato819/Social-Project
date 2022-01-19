@@ -30,10 +30,14 @@ let char = {
   standing: true,
 };
 let laser = {
-  origin: 0,
+  originX: 0,
+  originY: 0,
   xMove: 0,
   xLine: 0,
-  y: 0,
+  yMove: 0,
+  yLine: 0,
+  dx: 0,
+  dy: 0,
   shoot: 'ready',
   timer: 0,
   collide: false,
@@ -113,7 +117,7 @@ function newBlock(x, y, w, h, a, col) {
 // Create blocks
 let platform1 = newBlock(-100, 0, 50, 10);
 let platform2 = newBlock(-100, 0, 50, 10);
-let wallL1 = newBlock(-100, 0, 10, 50);
+let wallL1 = newBlock(100, 400, 10, 50);
 let wallL2 = newBlock(-100, 0, 10, 50);
 let wallC1 = newBlock(-100, 0, 0.01, 0);
 let wallC2 = newBlock(-100, 0, 0.01, 0);
@@ -198,18 +202,18 @@ function loop() {
     laser.shoot = true;
     laser.width = 4;
     if (rightIsPressed || leftIsPressed) {
-      laser.y = char.y + 37;
+      laser.originY = char.y + 37;
     } else {
-      laser.y = char.y + 34; // 
-    } // 
+      laser.originY = char.y + 34;
+    }
     if (char.imgY === 0) {
-      laser.origin = char.x + char.w + 13;
+      laser.originX = char.x + char.w + 13;
     } else if (char.imgY === 112) {
-      laser.origin = char.x + char.w + 23;
+      laser.originX = char.x + char.w + 23;
     } else if (char.imgY === 56) {
-      laser.origin = char.x - 13;
+      laser.originX = char.x - 13;
     } else if (char.imgY === 168) {
-      laser.origin = char.x - 23;
+      laser.originX = char.x - 23;
     }
   }
 
@@ -219,23 +223,35 @@ function loop() {
   }
 
   if (laser.shoot === true) {
-    laser.xMove = laser.origin;
-    laser.xLine = laser.origin;
+    laser.collide = false;
+    laser.xMove = laser.originX;
+    laser.xLine = laser.originX;
+    laser.yMove = laser.originY;
+    laser.yLine = laser.originY;
+    laser.dx = 0;
+    laser.dy = 0;
+    shootLaser();
+  }
+
+  function shootLaser() {
     while (!laser.collide) {
       if (checkMirrors === 'ready') {
         getCoordinates(mirror1);
         getCoordinates(mirror2);
       }
 
-      // Laser moves left or right
-      if (char.facing === 'right') {
-        laser.xMove = laser.xLine;
-        laser.xLine++;
+      if (laser.dy === 0) {
+        if (char.facing === "right") {
+          laser.dx = 1;
+        } else {
+          laser.dx = -1;
+        }
       }
-      if (char.facing === 'left') {
-        laser.xMove = laser.xLine;
-        laser.xLine--;
-      }
+
+      laser.xMove = laser.xLine;
+      laser.xLine += laser.dx;
+      laser.yMove = laser.yLine;
+      laser.yLine += laser.dy;
 
       // Check collision
       mirrorCollision(mirror1);
@@ -245,7 +261,7 @@ function loop() {
       wallCollide(wallL2);
       wallCollide(entrance);
 
-      if (laser.xLine < -1 || laser.xLine > cnv.width + 1) {
+      if (laser.xLine < -1 || laser.xLine > cnv.width + 1 || laser.yLine < 0 || laser.yLine > 600) {
         laser.collide = true;
       }
 
@@ -253,8 +269,8 @@ function loop() {
       ctx.lineWidth = laser.width;
       ctx.strokeStyle = 'red';
       ctx.beginPath();
-      ctx.moveTo(laser.xMove, laser.y);
-      ctx.lineTo(laser.xLine, laser.y);
+      ctx.moveTo(laser.xMove, laser.yMove);
+      ctx.lineTo(laser.xLine, laser.yLine);
       ctx.stroke();
     }
   }
@@ -286,23 +302,29 @@ function loop() {
   }
 
   function mirrorCollision(aMirror) {
-    let searchFor = '|' + parseInt(laser.xLine) + ',' + parseInt(laser.y) + '|';
+    let searchFor = '|' + parseInt(laser.xLine) + ',' + parseInt(laser.yLine) + '|';
     aMirror.coords = aMirror.coords.replace(searchFor, '|match|');
     if (aMirror.coords.includes('match')) {
-      laser.collide = true;
-      laser.xMove = laser.origin;
-      laser.xLine = laser.origin;
+      let coords2 = aMirror.coords.search('coords2');
+      let match = aMirror.coords.search('match');
+      if (match > coords2) {
+        laser.dy = 1;
+      } else if (match < coords2) {
+        laser.dy = -1;
+      }
+      checkMirrors = 'ready'
+      mirror1.coords = '';
+      mirror2.coords = '';
+      laser.dx = 0;
     }
   }
 
   function wallCollide(aWall) {
-    if (laser.xLine > aWall.x && laser.xLine < aWall.x + aWall.w && laser.y > aWall.y && laser.y < aWall.y + aWall.h) {
+    if (laser.xLine > aWall.x && laser.xLine < aWall.x + aWall.w && laser.yLine > aWall.y && laser.yLine < aWall.y + aWall.h) {
       laser.collide = true;
       if (aWall.a === 'hole') {
         openHole = true;
       }
-      laser.xMove = laser.origin;
-      laser.xLine = laser.origin;
     }
   }
 
@@ -359,11 +381,6 @@ function loop() {
   ctx.drawImage(document.getElementById('spritesheet'), char.imgX, char.imgY, 54, 56, char.x - 23, char.y - 2, 70, 72);
 
   if (laser.shoot != true) {
-    // Reset checkMirrors
-    checkMirrors = 'ready'
-    mirror1.coords = '';
-    mirror2.coords = '';
-
     // Animations
     if (rightIsPressed) {
       char.imgY = 0;
