@@ -284,9 +284,19 @@ function loop() {
         checkX--;
       }
       aMirror.coords += '///coords2///'
+      for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.y2; checkY++) {
+        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        checkX++;
+      }
+      aMirror.coords += '///coords3///'
       for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.cor2y; checkY++) {
         aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX--;
+      }
+      aMirror.coords += '///coords4///'
+      for (let checkY = aMirror.cor1y, checkX = aMirror.cor1x; checkY < aMirror.cor2y; checkY++) {
+        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        checkX++;
       }
     } else if (aMirror.r === 45) {
       for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
@@ -294,22 +304,33 @@ function loop() {
         checkX++;
       }
       aMirror.coords += '///coords2///'
+      for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.y2; checkY++) {
+        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        checkX--;
+      }
+      
+      aMirror.coords += '///coords3///'
       for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.cor2y; checkY++) {
         aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX++;
       }
+      aMirror.coords += '///coords4///'
+      for (let checkY = aMirror.cor1y, checkX = aMirror.cor1x; checkY < aMirror.cor2y; checkY++) {
+        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        checkX--;
+      }
     }
   }
-
+  console.log(mirror2.coords)
   function mirrorCollision(aMirror) {
     let searchFor = '|' + parseInt(laser.xLine) + ',' + parseInt(laser.yLine) + '|';
     aMirror.coords = aMirror.coords.replace(searchFor, '|match|');
     if (aMirror.coords.includes('match')) {
-      let coords2 = aMirror.coords.search('coords2');
+      let coords2 = aMirror.coords.search('coords3');
       let match = aMirror.coords.search('match');
       if (match > coords2) {
         laser.dy = 1;
-      } else if (match < coords2) {
+      } else {
         laser.dy = -1;
       }
       checkMirrors = 'ready'
