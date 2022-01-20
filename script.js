@@ -117,8 +117,9 @@ function newButton(x, y, w, h, action, activate, baseY, timer) {
 }
 
 // Create buttons
-let button1 = newButton(400, 454, 30, 10, 'button', '', '', 0);
-let button2 = newButton(500, 454, 30, 10, 'button', '', '', 0);
+let button1C = newButton(400, 454, 30, 10, 'button', '', '', 0);
+let button2C = newButton(500, 454, 30, 10, 'button', '', '', 0);
+let button1L = newButton(500, 454, 10, 30, 'button', '', '', 0);
 
 // Block function
 function newBlock(x, y, w, h, action, activate, img, color) {
@@ -227,21 +228,48 @@ function loop() {
   mirror135(mirror3);
   mirror45(mirror4);
 
+  function mirror45(aMirror) {
+    aMirror.x2 = aMirror.x1 + 6.5;
+    aMirror.y2 = aMirror.y1 + 6.5;
+    aMirror.cor1x = aMirror.x1 - 35;
+    aMirror.cor1y = aMirror.y1 + 35;
+    aMirror.cor2x = aMirror.cor1x + 6.5;
+    aMirror.cor2y = aMirror.cor1y + 6.5;
+  }
+
+  function mirror135(aMirror) {
+    aMirror.x2 = aMirror.x1 + 6.5;
+    aMirror.y2 = aMirror.y1 - 6.5;
+    aMirror.cor1x = aMirror.x1 + 35;
+    aMirror.cor1y = aMirror.y1 + 35;
+    aMirror.cor2x = aMirror.cor1x + 6.5;
+    aMirror.cor2y = aMirror.cor1y - 6.5;
+  }
+
   // Buttons
 
   // Draw button
-  drawButton(button1);
-  drawButton(button2);
+  drawButtonC(button1C);
+  drawButtonC(button2C);
 
-  function drawButton(aButton) {
+  function drawButtonC(aButtonC) {
     ctx.fillStyle = 'red';
-    ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
+    ctx.fillRect(aButtonC.x, aButtonC.y, aButtonC.w, aButtonC.h);
     ctx.fillStyle = 'grey';
-    ctx.fillRect(aButton.x + (aButton.w / 2) - 50 / 2, aButton.y + 10 + aButton.baseY, 50, 10);
+    ctx.fillRect(aButtonC.x + (aButtonC.w / 2) - 50 / 2, aButtonC.y + 10 + aButtonC.baseY, 50, 10);
   }
 
-  pressButton(button1);
-  pressButton(button2);
+  drawButtonL(button1L);
+
+  function drawButtonL(aButtonL) {
+    ctx.fillStyle = 'red';
+    ctx.fillRect(aButtonL.x, aButtonL.y, aButtonL.w, aButtonL.h);
+    ctx.fillStyle = 'grey';
+    ctx.fillRect(aButtonL.x + 10 + aButtonL.baseY, aButtonL.y + (aButtonL.h / 2) - 50 / 2, 10, 50);
+  }
+
+  pressButton(button1C);
+  pressButton(button2C);
 
   function pressButton(aButton) {
     if (aButton.activate === true) {
@@ -263,25 +291,6 @@ function loop() {
       aButton.baseY = 0;
       aButton.activate = false;
     }
-  }
-
-
-  function mirror45(aMirror) {
-    aMirror.x2 = aMirror.x1 + 6.5;
-    aMirror.y2 = aMirror.y1 + 6.5;
-    aMirror.cor1x = aMirror.x1 - 35;
-    aMirror.cor1y = aMirror.y1 + 35;
-    aMirror.cor2x = aMirror.cor1x + 6.5;
-    aMirror.cor2y = aMirror.cor1y + 6.5;
-  }
-
-  function mirror135(aMirror) {
-    aMirror.x2 = aMirror.x1 + 6.5;
-    aMirror.y2 = aMirror.y1 - 6.5;
-    aMirror.cor1x = aMirror.x1 + 35;
-    aMirror.cor1y = aMirror.y1 + 35;
-    aMirror.cor2x = aMirror.cor1x + 6.5;
-    aMirror.cor2y = aMirror.cor1y - 6.5;
   }
 
   // LASER
@@ -605,8 +614,8 @@ function loop() {
     wallCollide(wallC2);
     wallCollide(portal);
     wallCollide(showDialogue);
-    wallCollide(button1);
-    wallCollide(button2);
+    wallCollide(button1C);
+    wallCollide(button2C);
 
     // platform
     function platformCollide(aPlatform) {
