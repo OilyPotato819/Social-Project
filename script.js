@@ -102,16 +102,35 @@ function keyupHandler(event) {
 
 // CREATE LEVEL OBJECTS
 
-// Block function
-function newBlock(x, y, w, h, a, col, img) {
+// Button function
+function newButton(x, y, w, h, action, activate, baseY, timer) {
   return {
     x: x,
     y: y,
     w: w,
     h: h,
-    a: a,
-    col: col,
+    action: action,
+    activate: activate,
+    baseY: baseY,
+    timer: timer,
+  }
+}
+
+// Create buttons
+let button1 = newButton(400, 454, 30, 10, 'button', '', '', 0);
+let button2 = newButton(500, 454, 30, 10, 'button', '', '', 0);
+
+// Block function
+function newBlock(x, y, w, h, action, activate, img, color) {
+  return {
+    x: x,
+    y: y,
+    w: w,
+    h: h,
+    action: action,
+    activate: activate,
     img: img,
+    color: color,
   }
 }
 
@@ -125,16 +144,17 @@ let wallC2 = newBlock(-100, 0, 0.01, 0);
 let entrance = newBlock(-100, 0, 45, 35, 'hole');
 let hole = newBlock(-100, 474, 100, 0);
 let portal = newBlock(900, 380, 69, 90, 'portal');
-let dialogueBox = newBlock(0, 0, 0, 0, 'dialogue');
+let showDialogue = newBlock(0, 0, 0, 0, 'dialogue', true, document.getElementById("lvl1dia"));
+let dialogueImg = newBlock(0, 0, 0, 0, 'dialogue');
 
 // Mirror function
-function newMirror(x1, y1, a, r, coords, x2, y2, cor1x, cor1y, cor2x, cor2y, ) {
+function newMirror(x1, y1, action, coords, rotation, x2, y2, cor1x, cor1y, cor2x, cor2y, ) {
   return {
     x1: x1,
     y1: y1,
-    a: a,
-    r: r,
+    action: action,
     coords: coords,
+    rotation: rotation,
     x2: x2,
     y2: y2,
     cor1x: cor1x,
@@ -145,9 +165,10 @@ function newMirror(x1, y1, a, r, coords, x2, y2, cor1x, cor1y, cor2x, cor2y, ) {
 }
 
 // Create mirror
-let mirror1 = newMirror(700, 350, 'mirror', 135, '', '');
-let mirror2 = newMirror(670, 410, 'mirror', 45, '', '');
-let mirror3 = newMirror(500, 350, 'mirror', 45, '', '');
+let mirror1 = newMirror(700, 350, 'mirror', '', 135);
+let mirror2 = newMirror(670, 420, 'mirror', '', 45);
+let mirror3 = newMirror(750, 350, 'mirror', '', 45);
+let mirror4 = newMirror(780, 420, 'mirror', '', 135);
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
@@ -175,8 +196,11 @@ function loop() {
     ctx.globalAlpha = 1
   }
 
-  ctx.strokeStyle = 'black';
-  ctx.strokeRect(dialogueBox.x, dialogueBox.y, dialogueBox.w, dialogueBox.h);
+  // Dialogue box
+  if (showDialogue.activate) {
+    ctx.drawImage(showDialogue.img, dialogueImg.x, dialogueImg.y, dialogueImg.w, dialogueImg.h);
+  }
+  ctx.strokeRect(showDialogue.x, showDialogue.y, showDialogue.w, showDialogue.h);
 
   // Platforms
   ctx.fillStyle = 'blue';
@@ -201,6 +225,64 @@ function loop() {
   mirror45(mirror1);
   mirror135(mirror2);
   mirror135(mirror3);
+  mirror45(mirror4);
+
+  // Buttons
+
+  // Draw button
+  drawButton(button1);
+  drawButton(button2);
+
+  function drawButton(aButton) {
+    ctx.fillStyle = 'red';
+    ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
+    ctx.fillStyle = 'grey';
+    ctx.fillRect(aButton.x + (aButton.w / 2) - 50 / 2, aButton.y + 10 + aButton.baseY, 50, 10);
+  }
+
+  pressButton(button1);
+  pressButton(button2);
+
+  function pressButton(aButton) {
+    if (aButton.activate === true) {
+      aButton.y += 5;
+      aButton.h -= 5;
+      aButton.baseY = -5;
+      aButton.activate = 'wait';
+      aButton.timer = 0;
+    } else if (aButton.activate === 'count') {
+      aButton.timer++;
+      console.log(aButton.timer)
+      if (aButton.timer > 30) {
+        aButton.activate = 'reset';
+      }
+    }
+    if (aButton.activate === 'reset') {
+      aButton.y -= 5;
+      aButton.h += 5;
+      aButton.baseY = 0;
+      aButton.activate = false;
+    }
+  }
+
+
+  function mirror45(aMirror) {
+    aMirror.x2 = aMirror.x1 + 6.5;
+    aMirror.y2 = aMirror.y1 + 6.5;
+    aMirror.cor1x = aMirror.x1 - 35;
+    aMirror.cor1y = aMirror.y1 + 35;
+    aMirror.cor2x = aMirror.cor1x + 6.5;
+    aMirror.cor2y = aMirror.cor1y + 6.5;
+  }
+
+  function mirror135(aMirror) {
+    aMirror.x2 = aMirror.x1 + 6.5;
+    aMirror.y2 = aMirror.y1 - 6.5;
+    aMirror.cor1x = aMirror.x1 + 35;
+    aMirror.cor1y = aMirror.y1 + 35;
+    aMirror.cor2x = aMirror.cor1x + 6.5;
+    aMirror.cor2y = aMirror.cor1y - 6.5;
+  }
 
   // LASER
 
@@ -252,6 +334,7 @@ function loop() {
         getCoordinates(mirror1);
         getCoordinates(mirror2);
         getCoordinates(mirror3);
+        getCoordinates(mirror4);
       }
 
       laser.xMove = laser.xLine;
@@ -263,6 +346,7 @@ function loop() {
       mirrorCollision(mirror1);
       mirrorCollision(mirror2);
       mirrorCollision(mirror3);
+      mirrorCollision(mirror4);
 
       wallCollide(wallL1);
       wallCollide(wallL2);
@@ -285,7 +369,7 @@ function loop() {
   function getCoordinates(aMirror) {
     checkMirrors = true;
     aMirror.coords += '///coords1///'
-    if (aMirror.r === 135) {
+    if (aMirror.rotation === 135) {
       for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
         aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX--;
@@ -305,26 +389,25 @@ function loop() {
         aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX++;
       }
-    } else if (aMirror.r === 45) {
-      for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.cor2y; checkY++) {
-        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
-        checkX++;
-      }
-      aMirror.coords += '///coords2///'
+    } else if (aMirror.rotation === 45) {
       for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.y1; checkY++) {
         aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX--;
       }
-
-      aMirror.coords += '///coords3///'
-      for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
+      aMirror.coords += '///coords2///'
+      for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.cor2y; checkY++) {
         aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX++;
       }
-      aMirror.coords += '///coords4///'
+      aMirror.coords += '///coords3///'
       for (let checkY = aMirror.cor2y, checkX = aMirror.cor2x; checkY < aMirror.cor1y; checkY++) {
         aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX--;
+      }
+      aMirror.coords += '///coords4///'
+      for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
+        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        checkX++;
       }
     }
   }
@@ -333,37 +416,57 @@ function loop() {
     let searchFor = '|' + parseInt(laser.xLine) + ',' + parseInt(laser.yLine) + '|';
     aMirror.coords = aMirror.coords.replace(searchFor, '|match|');
     if (aMirror.coords.includes('match')) {
-      let coords2 = aMirror.coords.search('coords3');
+      let coords2 = aMirror.coords.search('coords2');
+      let coords3 = aMirror.coords.search('coords3');
+      let coords4 = aMirror.coords.search('coords4');
       let match = aMirror.coords.search('match');
-      if (match > coords2) {
-        if (laser.dx != 0) {
-          laser.dy = 1;
-          laser.dx = 0;
-        } else {
-          laser.dx = 1;
-          laser.dy = 0;
-        }
-      } else {
-        if (laser.dx != 0) {
-          laser.dy = -1;
-          laser.dx = 0;
-        } else {
-          console.log("yee")
+      if (match < coords2) {
+        if (laser.dx === 0) {
           laser.dx = -1;
           laser.dy = 0;
+        } else {
+          laser.dx = 0;
+          laser.dy = -1;
+        }
+      } else if (match > coords2 && match < coords3) {
+        if (laser.dx === 0) {
+          laser.dx = 1;
+          laser.dy = 0;
+        } else {
+          laser.dx = 0;
+          laser.dy = -1;
+        }
+      } else if (match > coords3 && match < coords4) {
+        if (laser.dx === 0) {
+          laser.dx = 1;
+          laser.dy = 0;
+        } else {
+          laser.dx = 0;
+          laser.dy = 1;
+        }
+      } else {
+        if (laser.dx === 0) {
+          laser.dx = -1;
+          laser.dy = 0;
+        } else {
+          laser.dx = 0;
+          laser.dy = 1;
         }
       }
+
       checkMirrors = 'ready'
       mirror1.coords = '';
       mirror2.coords = '';
       mirror3.coords = '';
+      mirror4.coords = '';
     }
   }
 
   function wallCollide(aWall) {
-    if (laser.xLine > aWall.x && laser.xLine < aWall.x + aWall.w && laser.yLine > aWall.y && laser.yLine < aWall.y + aWall.h) {
+    if (laser.xLine >= aWall.x && laser.xLine <= aWall.x + aWall.w && laser.yLine > aWall.y && laser.yLine < aWall.y + aWall.h) {
       laser.collide = true;
-      if (aWall.a === 'hole') {
+      laser.xLine;
+      if (aWall.action === 'hole') {
         openHole = true;
       }
     }
@@ -388,31 +491,12 @@ function loop() {
   // Draw mirrors
   ctx.lineWidth = 1;
   ctx.strokeStyle = 'black';
+  drawMirror(mirror1);
+  drawMirror(mirror2);
+  drawMirror(mirror3);
+  drawMirror(mirror4);
 
-  function mirror45(aMirror) {
-    aMirror.x2 = aMirror.x1 + 6.5;
-    aMirror.y2 = aMirror.y1 + 6.5;
-    aMirror.cor1x = aMirror.x1 - 35;
-    aMirror.cor1y = aMirror.y1 + 35;
-    aMirror.cor2x = aMirror.cor1x + 6.5;
-    aMirror.cor2y = aMirror.cor1y + 6.5;
-    ctx.fillStyle = 'blue';
-    ctx.beginPath();
-    ctx.moveTo(aMirror.x1, aMirror.y1);
-    ctx.lineTo(aMirror.cor1x, aMirror.cor1y);
-    ctx.lineTo(aMirror.cor2x, aMirror.cor2y);
-    ctx.lineTo(aMirror.x2, aMirror.y2);
-    ctx.closePath();
-    ctx.stroke();
-  }
-
-  function mirror135(aMirror) {
-    aMirror.x2 = aMirror.x1 + 6.5;
-    aMirror.y2 = aMirror.y1 - 6.5;
-    aMirror.cor1x = aMirror.x1 + 35;
-    aMirror.cor1y = aMirror.y1 + 35;
-    aMirror.cor2x = aMirror.cor1x + 6.5;
-    aMirror.cor2y = aMirror.cor1y - 6.5;
+  function drawMirror(aMirror) {
     ctx.beginPath();
     ctx.moveTo(aMirror.x1, aMirror.y1);
     ctx.lineTo(aMirror.cor1x, aMirror.cor1y);
@@ -485,7 +569,7 @@ function loop() {
     // wall
     function wallCollide(aWall) {
       if (char.x + char.w > aWall.x && char.x < aWall.x + aWall.w && char.y + char.h > aWall.y && char.y < aWall.y + aWall.h) {
-        if (aWall.a === 'portal') {
+        if (aWall.action === 'portal') {
           screen = screen.replace(/puzzle|title/, '');
           let levelNum = +screen;
           levelNum++;
@@ -494,24 +578,35 @@ function loop() {
           level2Setup();
           level3Setup();
           level4Setup();
-          // i did it just now
-          // at the beginning of each level give it the right value
-          // then draw it with that value as the image part
           level5Setup();
-        } else if (aWall.a === 'dialogue') {
-          let dia1 = document.getElementById("lvl1dia");
-          ctx.drawImage(dia1, 50, 50);
+        } else if (aWall.action === 'dialogue') {
+          aWall.activate = true;
+        } else if (aWall.action === 'button') {
+          if (aWall.activate != 'wait' && aWall.activate != 'count') {
+            aWall.activate = true;
+          }
         } else if (char.facing === 'right') {
           char.x = aWall.x - char.w - 1;
         } else if (char.facing === 'left') {
-          char.x = aWall.x + aWall.w
+          char.x = aWall.x + aWall.w;
+        } else {
+          aWall.activate = false;
+
+        }
+      } else {
+        if (aWall.action === 'button' && aWall.activate != false) {
+          aWall.activate = 'count';
+        } else {
+          aWall.activate = false;
         }
       }
     }
     wallCollide(wallC1);
     wallCollide(wallC2);
     wallCollide(portal);
-    wallCollide(dialogueBox);
+    wallCollide(showDialogue);
+    wallCollide(button1);
+    wallCollide(button2);
 
     // platform
     function platformCollide(aPlatform) {
@@ -592,11 +687,16 @@ function level1Setup() {
     entrance.w = 45.1;
     entrance.h = 50;
     hole.x = 920;
-    hole.col = '#ffeb3b';
-    dialogueBox.x = 430;
-    dialogueBox.y = 400;
-    dialogueBox.w = 75;
-    dialogueBox.h = 50;
+    hole.color = '#ffeb3b';
+    showDialogue.img = document.getElementById("lvl1dia");
+    showDialogue.x = 430;
+    showDialogue.y = 400;
+    showDialogue.w = 75;
+    showDialogue.h = 50;
+    dialogueImg.x = 340;
+    dialogueImg.y = 230;
+    dialogueImg.w = 300;
+    dialogueImg.h = 300;
   }
 }
 
@@ -609,11 +709,16 @@ function level2Setup() {
     entrance.w = 45.1;
     entrance.h = 50;
     hole.x = 615;
-    hole.col = '#8d6e63';
-    dialogueBox.x = 350;
-    dialogueBox.y = 400;
-    dialogueBox.w = 75;
-    dialogueBox.h = 50;
+    hole.color = '#8d6e63';
+    showDialogue.img = document.getElementById("lvl2dia");
+    showDialogue.x = 355;
+    showDialogue.y = 400;
+    showDialogue.w = 75;
+    showDialogue.h = 50;
+    dialogueImg.x = 238;
+    dialogueImg.y = 230;
+    dialogueImg.w = 300;
+    dialogueImg.h = 300;
   }
 }
 
@@ -626,11 +731,16 @@ function level3Setup() {
     entrance.w = 45.1;
     entrance.h = 50;
     hole.x = 615;
-    hole.col = '#685a55';
-    dialogueBox.x = 520;
-    dialogueBox.y = 400;
-    dialogueBox.w = 75;
-    dialogueBox.h = 50;
+    hole.color = '#685a55';
+    showDialogue.img = document.getElementById("lvl3dia");
+    showDialogue.x = 510;
+    showDialogue.y = 400;
+    showDialogue.w = 75;
+    showDialogue.h = 50;
+    dialogueImg.x = 400;
+    dialogueImg.y = 230;
+    dialogueImg.w = 300;
+    dialogueImg.h = 300;
   }
 }
 
@@ -643,11 +753,16 @@ function level4Setup() {
     entrance.w = 45.1;
     entrance.h = 50;
     hole.x = 850;
-    hole.col = '#9e939e';
-    dialogueBox.x = 1200;
-    dialogueBox.y = 400;
-    dialogueBox.w = 75;
-    dialogueBox.h = 50;
+    hole.color = '#9e939e';
+    showDialogue.img = document.getElementById("lvl4dia");
+    showDialogue.x = 620;
+    showDialogue.y = 400;
+    showDialogue.w = 75;
+    showDialogue.h = 50;
+    dialogueImg.x = 570;
+    dialogueImg.y = 215;
+    dialogueImg.w = 300;
+    dialogueImg.h = 300;
   }
 }
 
@@ -660,11 +775,16 @@ function level5Setup() {
     entrance.w = 45.1;
     entrance.h = 50;
     hole.x = 200;
-    hole.col = '#5c5353';
-    dialogueBox.x = 100;
-    dialogueBox.y = 400;
-    dialogueBox.w = 75;
-    dialogueBox.h = 50;
+    hole.color = '#5c5353';
+    showDialogue.img = document.getElementById("lvl5dia");
+    showDialogue.x = 75;
+    showDialogue.y = 400;
+    showDialogue.w = 75;
+    showDialogue.h = 50;
+    dialogueImg.x = -15;
+    dialogueImg.y = 235;
+    dialogueImg.w = 300;
+    dialogueImg.h = 300;
   }
 }
 
@@ -720,6 +840,8 @@ function puzzleSetup() {
   char.y = 0 - char.h;
   hole.h = 0;
   entrance.x = -100;
+  showDialogue.x = 75;
+  showDialogue.y = 400;
 }
 
 function hideAll() {
