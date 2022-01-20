@@ -103,7 +103,7 @@ function keyupHandler(event) {
 // CREATE LEVEL OBJECTS
 
 // Button function
-function newButton(x, y, w, h, action, activate, baseY, timer) {
+function newButton(x, y, w, h, action, activate, baseX, baseY, baseW, baseH, timer) {
   return {
     x: x,
     y: y,
@@ -111,15 +111,19 @@ function newButton(x, y, w, h, action, activate, baseY, timer) {
     h: h,
     action: action,
     activate: activate,
+    baseX: baseX,
     baseY: baseY,
+    baseW: baseW,
+    baseH: baseH,
     timer: timer,
   }
 }
 
 // Create buttons
-let button1C = newButton(400, 454, 30, 10, 'button', '', '', 0);
-let button2C = newButton(500, 454, 30, 10, 'button', '', '', 0);
-let button1L = newButton(500, 454, 10, 30, 'button', '', '', 0);
+let button1U = newButton(400, 454, 30, 10, 'button', '', '', 0);
+let button2U = newButton(500, 454, 30, 10, 'button', '', '', 0);
+let button1L = newButton(600, 410, 10, 30, 'button', '', '', 0);
+let button1R = newButton(320, 410, 10, 30, 'button', '', '', 0);
 
 // Block function
 function newBlock(x, y, w, h, action, activate, img, color) {
@@ -212,7 +216,7 @@ function loop() {
   ctx.fillRect(wallL1.x, wallL1.y, wallL1.w, wallL1.h);
   ctx.fillRect(wallL2.x, wallL2.y, wallL2.w, wallL2.h);
   ctx.fillRect(entrance.x, entrance.y, entrance.w, entrance.h);
-  ctx.fillStyle = hole.c;
+  ctx.fillStyle = hole.color;
   ctx.fillRect(wallC1.x, wallC1.y, wallC1.w, wallC1.h);
   ctx.fillRect(wallC2.x, wallC2.y, wallC2.w, wallC2.h);
 
@@ -248,39 +252,50 @@ function loop() {
 
   // Buttons
 
-  // Draw button
-  drawButtonC(button1C);
-  drawButtonC(button2C);
-
-  function drawButtonC(aButtonC) {
-    ctx.fillStyle = 'red';
-    ctx.fillRect(aButtonC.x, aButtonC.y, aButtonC.w, aButtonC.h);
-    ctx.fillStyle = 'grey';
-    ctx.fillRect(aButtonC.x + (aButtonC.w / 2) - 50 / 2, aButtonC.y + 10 + aButtonC.baseY, 50, 10);
-  }
-
+  // Draw buttons
+  drawButtonU(button1U);
+  drawButtonU(button2U);
   drawButtonL(button1L);
+  drawButtonR(button1R);
 
-  function drawButtonL(aButtonL) {
+  function drawButtonU(aButton) {
+    if (!aButton.activate) {
+      aButton.baseX = aButton.x + (aButton.w / 2) - 50 / 2;
+      aButton.baseY = aButton.y + 10;
+    }
     ctx.fillStyle = 'red';
-    ctx.fillRect(aButtonL.x, aButtonL.y, aButtonL.w, aButtonL.h);
+    ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
     ctx.fillStyle = 'grey';
-    ctx.fillRect(aButtonL.x + 10 + aButtonL.baseY, aButtonL.y + (aButtonL.h / 2) - 50 / 2, 10, 50);
+    ctx.fillRect(aButton.baseX, aButton.baseY, 50, 10);
   }
 
-  pressButton(button1C);
-  pressButton(button2C);
+  function drawButtonL(aButton) {
+    ctx.fillStyle = 'red';
+    ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
+    ctx.fillStyle = 'grey';
+    ctx.fillRect(aButton.x + 10 + aButton.base, aButton.y + (aButton.h / 2) - 50 / 2, 10, 50);
+  }
 
-  function pressButton(aButton) {
+  function drawButtonR(aButton) {
+    ctx.fillStyle = 'red';
+    ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
+    ctx.fillStyle = 'grey';
+    ctx.fillRect(aButton.x - 10, aButton.y + (aButton.h / 2) - 50 / 2, 10, 50);
+  }
+
+  pressButtonU(button1U);
+  pressButtonU(button2U);
+  pressButtonL(button1L);
+  pressButtonR(button1R);
+
+  function pressButtonU(aButton) {
     if (aButton.activate === true) {
       aButton.y += 5;
       aButton.h -= 5;
-      aButton.baseY = -5;
       aButton.activate = 'wait';
       aButton.timer = 0;
     } else if (aButton.activate === 'count') {
       aButton.timer++;
-      console.log(aButton.timer)
       if (aButton.timer > 30) {
         aButton.activate = 'reset';
       }
@@ -288,7 +303,44 @@ function loop() {
     if (aButton.activate === 'reset') {
       aButton.y -= 5;
       aButton.h += 5;
-      aButton.baseY = 0;
+      aButton.activate = false;
+    }
+  }
+
+  function pressButtonL(aButton) {
+    if (aButton.activate === true) {
+      aButton.x += 5;
+      aButton.w -= 5;
+      aButton.base = -5;
+      aButton.activate = 'wait';
+      aButton.timer = 0;
+    } else if (aButton.activate === 'count') {
+      aButton.timer++;
+      if (aButton.timer > 30) {
+        aButton.activate = 'reset';
+      }
+    }
+    if (aButton.activate === 'reset') {
+      aButton.x -= 5;
+      aButton.w += 5;
+      aButton.base = 0;
+      aButton.activate = false;
+    }
+  }
+
+  function pressButtonR(aButton) {
+    if (aButton.activate === true) {
+      aButton.w -= 5;
+      aButton.activate = 'wait';
+      aButton.timer = 0;
+    } else if (aButton.activate === 'count') {
+      aButton.timer++;
+      if (aButton.timer > 30) {
+        aButton.activate = 'reset';
+      }
+    }
+    if (aButton.activate === 'reset') {
+      aButton.w += 5;
       aButton.activate = false;
     }
   }
@@ -360,6 +412,8 @@ function loop() {
       wallCollide(wallL1);
       wallCollide(wallL2);
       wallCollide(entrance);
+      wallCollide(button1L);
+      wallCollide(button1R);
 
       if (laser.xLine < -1 || laser.xLine > cnv.width + 1 || laser.yLine < 0 || laser.yLine > 473) {
         laser.collide = true;
@@ -477,6 +531,10 @@ function loop() {
       laser.xLine;
       if (aWall.action === 'hole') {
         openHole = true;
+      } else if (aWall.action === 'button') {
+        if (aWall.activate != 'wait' && aWall.activate != 'count') {
+          aWall.activate = true;
+        }
       }
     }
   }
@@ -614,8 +672,10 @@ function loop() {
     wallCollide(wallC2);
     wallCollide(portal);
     wallCollide(showDialogue);
-    wallCollide(button1C);
-    wallCollide(button2C);
+    wallCollide(button1U);
+    wallCollide(button2U);
+    wallCollide(button1L);
+    wallCollide(button1R);
 
     // platform
     function platformCollide(aPlatform) {
@@ -698,12 +758,12 @@ function level1Setup() {
     hole.x = 920;
     hole.color = '#ffeb3b';
     showDialogue.img = document.getElementById("lvl1dia");
-    showDialogue.x = 430;
+    showDialogue.x = 420;
     showDialogue.y = 400;
-    showDialogue.w = 75;
+    showDialogue.w = 100;
     showDialogue.h = 50;
-    dialogueImg.x = 340;
-    dialogueImg.y = 230;
+    dialogueImg.x = 305;
+    dialogueImg.y = 235;
     dialogueImg.w = 300;
     dialogueImg.h = 300;
   }
@@ -720,9 +780,9 @@ function level2Setup() {
     hole.x = 615;
     hole.color = '#8d6e63';
     showDialogue.img = document.getElementById("lvl2dia");
-    showDialogue.x = 355;
+    showDialogue.x = 345;
     showDialogue.y = 400;
-    showDialogue.w = 75;
+    showDialogue.w = 100;
     showDialogue.h = 50;
     dialogueImg.x = 238;
     dialogueImg.y = 230;
@@ -742,9 +802,9 @@ function level3Setup() {
     hole.x = 615;
     hole.color = '#685a55';
     showDialogue.img = document.getElementById("lvl3dia");
-    showDialogue.x = 510;
+    showDialogue.x = 500;
     showDialogue.y = 400;
-    showDialogue.w = 75;
+    showDialogue.w = 100;
     showDialogue.h = 50;
     dialogueImg.x = 400;
     dialogueImg.y = 230;
@@ -764,9 +824,9 @@ function level4Setup() {
     hole.x = 850;
     hole.color = '#9e939e';
     showDialogue.img = document.getElementById("lvl4dia");
-    showDialogue.x = 620;
+    showDialogue.x = 610;
     showDialogue.y = 400;
-    showDialogue.w = 75;
+    showDialogue.w = 100;
     showDialogue.h = 50;
     dialogueImg.x = 570;
     dialogueImg.y = 215;
@@ -786,7 +846,7 @@ function level5Setup() {
     hole.x = 200;
     hole.color = '#5c5353';
     showDialogue.img = document.getElementById("lvl5dia");
-    showDialogue.x = 75;
+    showDialogue.x = 90;
     showDialogue.y = 400;
     showDialogue.w = 75;
     showDialogue.h = 50;
