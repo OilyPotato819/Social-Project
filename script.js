@@ -103,27 +103,27 @@ function keyupHandler(event) {
 // CREATE LEVEL OBJECTS
 
 // Button function
-function newButton(x, y, w, h, action, activate, baseX, baseY, baseW, baseH, timer) {
+function newButton(x, y, w, h, action, baseX, baseY, baseW, baseH, activate, timer) {
   return {
     x: x,
     y: y,
     w: w,
     h: h,
     action: action,
-    activate: activate,
     baseX: baseX,
     baseY: baseY,
     baseW: baseW,
     baseH: baseH,
+    activate: activate,
     timer: timer,
   }
 }
 
 // Create buttons
-let button1U = newButton(400, 454, 30, 10, 'button', '', '', 0);
-let button2U = newButton(500, 454, 30, 10, 'button', '', '', 0);
-let button1L = newButton(600, 410, 10, 30, 'button', '', '', 0);
-let button1R = newButton(320, 410, 10, 30, 'button', '', '', 0);
+let button1U = newButton(400, 454, 30, 10, 'button', 0, 0, 50, 10, false);
+let button2U = newButton(500, 454, 30, 10, 'button', 0, 0, 50, 10, false);
+let button1L = newButton(600, 410, 10, 30, 'button', 0, 0, 10, 50, false);
+let button1R = newButton(320, 410, 10, 30, 'button', 0, 0, 10, 50, false);
 
 // Block function
 function newBlock(x, y, w, h, action, activate, img, color) {
@@ -260,27 +260,35 @@ function loop() {
 
   function drawButtonU(aButton) {
     if (!aButton.activate) {
-      aButton.baseX = aButton.x + (aButton.w / 2) - 50 / 2;
-      aButton.baseY = aButton.y + 10;
+      aButton.baseX = aButton.x + (aButton.w / 2) - aButton.baseW / 2;
+      aButton.baseY = aButton.y + aButton.h;
     }
     ctx.fillStyle = 'red';
     ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
     ctx.fillStyle = 'grey';
-    ctx.fillRect(aButton.baseX, aButton.baseY, 50, 10);
+    ctx.fillRect(aButton.baseX, aButton.baseY, aButton.baseW, aButton.baseH);
   }
 
   function drawButtonL(aButton) {
+    if (!aButton.activate) {
+      aButton.baseX = aButton.x + aButton.w;
+      aButton.baseY = aButton.y + (aButton.h / 2) - aButton.baseH / 2;
+    }
     ctx.fillStyle = 'red';
     ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
     ctx.fillStyle = 'grey';
-    ctx.fillRect(aButton.x + 10 + aButton.base, aButton.y + (aButton.h / 2) - 50 / 2, 10, 50);
+    ctx.fillRect(aButton.baseX, aButton.baseY, aButton.baseW, aButton.baseH);
   }
 
   function drawButtonR(aButton) {
+    if (!aButton.activate) {
+      aButton.baseX = aButton.x - aButton.w;
+      aButton.baseY = aButton.y + (aButton.h / 2) - aButton.baseH / 2;
+    }
     ctx.fillStyle = 'red';
     ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
     ctx.fillStyle = 'grey';
-    ctx.fillRect(aButton.x - 10, aButton.y + (aButton.h / 2) - 50 / 2, 10, 50);
+    ctx.fillRect(aButton.baseX, aButton.baseY, aButton.baseW, aButton.baseH);
   }
 
   pressButtonU(button1U);
@@ -311,7 +319,6 @@ function loop() {
     if (aButton.activate === true) {
       aButton.x += 5;
       aButton.w -= 5;
-      aButton.base = -5;
       aButton.activate = 'wait';
       aButton.timer = 0;
     } else if (aButton.activate === 'count') {
@@ -323,7 +330,6 @@ function loop() {
     if (aButton.activate === 'reset') {
       aButton.x -= 5;
       aButton.w += 5;
-      aButton.base = 0;
       aButton.activate = false;
     }
   }
@@ -795,7 +801,7 @@ function level3Setup() {
   if (screen === 'level3') {
     background = document.getElementById('level3');
     hideAll();
-    entrance.x = 549;
+    entrance.x = 700;
     entrance.y = 386;
     entrance.w = 45.1;
     entrance.h = 50;
