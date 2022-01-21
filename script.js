@@ -18,6 +18,9 @@ let upIsPressed = false;
 let distance;
 let opacity = 0;
 let checkMirrors = 'ready';
+let showInfo = false;
+let infoCount = 0;
+let infoImg;
 let char = {
   imgX: 0,
   imgY: 0,
@@ -25,7 +28,7 @@ let char = {
   y: 474 - 54,
   w: 24,
   h: 69,
-  facing: 'right',
+  facing: 'left',
   gravity: 0,
   standing: true,
 };
@@ -47,19 +50,51 @@ let laser = {
 // EVENT LISTENERS
 document.addEventListener('keydown', keydownHandler);
 document.addEventListener('keyup', keyupHandler);
+document.addEventListener("mousemove", mousemoveHandler);
+document.addEventListener("click", clickHandler);
 
 // FUNCTIONS
-cnv.addEventListener('click', function (evt) {
-  var mousePos = getMousePos(cnv, evt);
-  console.log(mousePos.x + ',' + mousePos.y);
-}, false);
 
-function getMousePos(canvas, evt) {
-  var rect = canvas.getBoundingClientRect();
-  return {
-    x: evt.clientX - rect.left,
-    y: evt.clientY - rect.top
-  };
+function mousemoveHandler(event) {
+  let pointerCheck = 0;
+  let cnvRect = cnv.getBoundingClientRect();
+  var mouseX = event.x - cnvRect.x;
+  var mouseY = event.y - cnvRect.y;
+  calculateDistance(mirror1);
+  calculateDistance(mirror2);
+  calculateDistance(mirror3);
+  calculateDistance(mirror4);
+
+  function calculateDistance(aMirror) {
+    let run = Math.abs(mouseX - aMirror.centerX);
+    let rise = Math.abs(mouseY - aMirror.centerY);
+    distance = Math.sqrt(run ** 2 + rise ** 2);
+    if (distance < 5) {
+      document.body.style.cursor = "pointer";
+      pointerCheck += 1;
+      if (aMirror.clicked === 'too far') {
+        aMirror.clicked = 'click?';
+      }
+    } else if (aMirror.clicked != 'clicked') {
+      aMirror.clicked = 'too far';
+    }
+    if (pointerCheck === 0) {
+      document.body.style.cursor = "default";
+    }
+  }
+}
+
+function clickHandler() {
+  checkIfClicked(mirror1);
+  checkIfClicked(mirror2);
+  checkIfClicked(mirror3);
+  checkIfClicked(mirror4);
+
+  function checkIfClicked(aMirror) {
+    if (aMirror.clicked === 'click?') {
+      aMirror.rotation = 'changing';
+    }
+  }
 }
 
 function keydownHandler(event) {
@@ -103,27 +138,50 @@ function keyupHandler(event) {
 // CREATE LEVEL OBJECTS
 
 // Button function
-function newButton(x, y, w, h, action, baseX, baseY, baseW, baseH, activate, timer) {
+function newButton(x, y, w, h, action, activate, base, timer) {
   return {
     x: x,
     y: y,
     w: w,
     h: h,
     action: action,
-    baseX: baseX,
-    baseY: baseY,
-    baseW: baseW,
-    baseH: baseH,
     activate: activate,
+    base: base,
     timer: timer,
   }
 }
 
 // Create buttons
-let button1U = newButton(400, 454, 30, 10, 'button', 0, 0, 50, 10, false);
-let button2U = newButton(500, 454, 30, 10, 'button', 0, 0, 50, 10, false);
-let button1L = newButton(600, 410, 10, 30, 'button', 0, 0, 10, 50, false);
-let button1R = newButton(320, 410, 10, 30, 'button', 0, 0, 10, 50, false);
+let button1U = newButton(400, 454, 30, 10, 'button', false, {
+  x: 0,
+  y: 0,
+  w: 50,
+  h: 10
+});
+let button2U = newButton(500, 454, 30, 10, 'button', false, {
+  x: 0,
+  y: 0,
+  w: 50,
+  h: 10
+});
+let button1D = newButton(470, 300, 30, 10, 'button', false, {
+  x: 0,
+  y: 0,
+  w: 50,
+  h: 10
+});
+let button1L = newButton(600, 410, 10, 30, 'button', false, {
+  x: 0,
+  y: 0,
+  w: 10,
+  h: 50
+});
+let button1R = newButton(320, 410, 10, 30, 'button', false, {
+  x: 0,
+  y: 0,
+  w: 10,
+  h: 50
+});
 
 // Block function
 function newBlock(x, y, w, h, action, activate, img, color) {
@@ -153,8 +211,11 @@ let showDialogue = newBlock(0, 0, 0, 0, 'dialogue', true, document.getElementByI
 let dialogueImg = newBlock(0, 0, 0, 0, 'dialogue');
 
 // Mirror function
-function newMirror(x1, y1, action, coords, rotation, x2, y2, cor1x, cor1y, cor2x, cor2y, ) {
+function newMirror(centerX, centerY, angle, x1, y1, action, coords, rotation, x2, y2, cor1x, cor1y, cor2x, cor2y, clicked) {
   return {
+    centerX: centerX,
+    centerY: centerY,
+    angle: angle,
     x1: x1,
     y1: y1,
     action: action,
@@ -166,26 +227,23 @@ function newMirror(x1, y1, action, coords, rotation, x2, y2, cor1x, cor1y, cor2x
     cor1y: cor1y,
     cor2x: cor2x,
     cor2y: cor2y,
+    clicked: clicked,
   }
 }
 
 // Create mirror
-let mirror1 = newMirror(700, 350, 'mirror', '', 135);
-let mirror2 = newMirror(670, 420, 'mirror', '', 45);
-let mirror3 = newMirror(750, 350, 'mirror', '', 45);
-let mirror4 = newMirror(780, 420, 'mirror', '', 135);
+let mirror1 = newMirror(200, 420, 135, 700, 350, 'mirror', '', 135);
+let mirror2 = newMirror(300, 420, 45, 670, 420, 'mirror', '', 45);
+let mirror3 = newMirror(400, 420, 45, 750, 350, 'mirror', '', 45);
+let mirror4 = newMirror(500, 420, 135, 780, 420, 'mirror', '', 135);
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
 
 function loop() {
   frameCount++;
-  // Play button
-  ctx.fillStyle = 'black';
-  ctx.arc(500, 300, 30, 0, 2 * Math.PI);
-  ctx.fill();
-  // SET UP LEVEL
 
+  // SET UP LEVEL
   // Draw background
   ctx.drawImage(background, 0, 0, cnv.width, cnv.height);
 
@@ -205,7 +263,6 @@ function loop() {
   if (showDialogue.activate) {
     ctx.drawImage(showDialogue.img, dialogueImg.x, dialogueImg.y, dialogueImg.w, dialogueImg.h);
   }
-  ctx.strokeRect(showDialogue.x, showDialogue.y, showDialogue.w, showDialogue.h);
 
   // Platforms
   ctx.fillStyle = 'blue';
@@ -215,7 +272,6 @@ function loop() {
   // Walls
   ctx.fillRect(wallL1.x, wallL1.y, wallL1.w, wallL1.h);
   ctx.fillRect(wallL2.x, wallL2.y, wallL2.w, wallL2.h);
-  ctx.fillRect(entrance.x, entrance.y, entrance.w, entrance.h);
   ctx.fillStyle = hole.color;
   ctx.fillRect(wallC1.x, wallC1.y, wallC1.w, wallC1.h);
   ctx.fillRect(wallC2.x, wallC2.y, wallC2.w, wallC2.h);
@@ -227,27 +283,38 @@ function loop() {
   ctx.drawImage(document.getElementById('portal'), portal.x, portal.y, portal.w, portal.h);
 
   // Mirrors
-  mirror45(mirror1);
-  mirror135(mirror2);
-  mirror135(mirror3);
-  mirror45(mirror4);
+  createMirror(mirror1);
+  createMirror(mirror2);
+  createMirror(mirror3);
+  createMirror(mirror4);
 
-  function mirror45(aMirror) {
-    aMirror.x2 = aMirror.x1 + 6.5;
-    aMirror.y2 = aMirror.y1 + 6.5;
-    aMirror.cor1x = aMirror.x1 - 35;
-    aMirror.cor1y = aMirror.y1 + 35;
-    aMirror.cor2x = aMirror.cor1x + 6.5;
-    aMirror.cor2y = aMirror.cor1y + 6.5;
+  function createMirror(aMirror) {
+    aMirror.x1 = aMirror.centerX + (25 * Math.cos((aMirror.angle + 170) * Math.PI / 180));
+    aMirror.y1 = aMirror.centerY + (25 * Math.sin((aMirror.angle + 170) * Math.PI / 180));
+    aMirror.x2 = aMirror.centerX + (25 * Math.cos((aMirror.angle + 190) * Math.PI / 180));
+    aMirror.y2 = aMirror.centerY + (25 * Math.sin((aMirror.angle + 190) * Math.PI / 180));
+    aMirror.cor1x = aMirror.centerX + (25 * Math.cos((aMirror.angle + 10) * Math.PI / 180));
+    aMirror.cor1y = aMirror.centerY + (25 * Math.sin((aMirror.angle + 10) * Math.PI / 180));
+    aMirror.cor2x = aMirror.centerX + (25 * Math.cos((aMirror.angle - 10) * Math.PI / 180));
+    aMirror.cor2y = aMirror.centerY + (25 * Math.sin((aMirror.angle - 10) * Math.PI / 180));
   }
 
-  function mirror135(aMirror) {
-    aMirror.x2 = aMirror.x1 + 6.5;
-    aMirror.y2 = aMirror.y1 - 6.5;
-    aMirror.cor1x = aMirror.x1 + 35;
-    aMirror.cor1y = aMirror.y1 + 35;
-    aMirror.cor2x = aMirror.cor1x + 6.5;
-    aMirror.cor2y = aMirror.cor1y - 6.5;
+  rotateMirror(mirror1);
+  rotateMirror(mirror2);
+  rotateMirror(mirror3);
+  rotateMirror(mirror4);
+
+  function rotateMirror(aMirror) {
+    if (aMirror.rotation === 'changing') {
+      aMirror.angle += 3;
+      if (aMirror.angle === 225) {
+        aMirror.rotation = 45;
+        aMirror.angle = 45;
+      } else if (aMirror.angle === 135) {
+        aMirror.rotation = 135;
+        aMirror.angle = 135;
+      }
+    }
   }
 
   // Buttons
@@ -255,44 +322,59 @@ function loop() {
   // Draw buttons
   drawButtonU(button1U);
   drawButtonU(button2U);
+  drawButtonD(button1D);
   drawButtonL(button1L);
   drawButtonR(button1R);
 
   function drawButtonU(aButton) {
     if (!aButton.activate) {
-      aButton.baseX = aButton.x + (aButton.w / 2) - aButton.baseW / 2;
-      aButton.baseY = aButton.y + aButton.h;
+      aButton.base.x = aButton.x + (aButton.w / 2) - aButton.base.w / 2;
+      aButton.base.y = aButton.y + aButton.h;
     }
     ctx.fillStyle = 'red';
     ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
     ctx.fillStyle = 'grey';
-    ctx.fillRect(aButton.baseX, aButton.baseY, aButton.baseW, aButton.baseH);
+    ctx.fillRect(aButton.base.x, aButton.base.y, aButton.base.w, aButton.base.h);
+    ctx.fillRect(aButton.base.x, aButton.base.y, aButton.base.w, aButton.base.h);
+  }
+  
+  function drawButtonD(aButton) {
+    if (!aButton.activate) {
+      aButton.base.x = aButton.x + (aButton.w / 2) - aButton.base.w / 2;
+      aButton.base.y = aButton.y - aButton.h;
+    }
+    ctx.fillStyle = 'red';
+    ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
+    ctx.fillStyle = 'grey';
+    ctx.fillRect(aButton.base.x, aButton.base.y, aButton.base.w, aButton.base.h);
+    ctx.fillRect(aButton.base.x, aButton.base.y, aButton.base.w, aButton.base.h);
   }
 
   function drawButtonL(aButton) {
     if (!aButton.activate) {
-      aButton.baseX = aButton.x + aButton.w;
-      aButton.baseY = aButton.y + (aButton.h / 2) - aButton.baseH / 2;
+      aButton.base.x = aButton.x + aButton.w;
+      aButton.base.y = aButton.y + (aButton.h / 2) - aButton.base.h / 2;
     }
     ctx.fillStyle = 'red';
     ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
     ctx.fillStyle = 'grey';
-    ctx.fillRect(aButton.baseX, aButton.baseY, aButton.baseW, aButton.baseH);
+    ctx.fillRect(aButton.base.x, aButton.base.y, aButton.base.w, aButton.base.h);
   }
 
   function drawButtonR(aButton) {
     if (!aButton.activate) {
-      aButton.baseX = aButton.x - aButton.w;
-      aButton.baseY = aButton.y + (aButton.h / 2) - aButton.baseH / 2;
+      aButton.base.x = aButton.x - aButton.w;
+      aButton.base.y = aButton.y + (aButton.h / 2) - aButton.base.h / 2;
     }
     ctx.fillStyle = 'red';
     ctx.fillRect(aButton.x, aButton.y, aButton.w, aButton.h);
     ctx.fillStyle = 'grey';
-    ctx.fillRect(aButton.baseX, aButton.baseY, aButton.baseW, aButton.baseH);
+    ctx.fillRect(aButton.base.x, aButton.base.y, aButton.base.w, aButton.base.h);
   }
 
   pressButtonU(button1U);
   pressButtonU(button2U);
+  pressButtonD(button1D);
   pressButtonL(button1L);
   pressButtonR(button1R);
 
@@ -310,6 +392,23 @@ function loop() {
     }
     if (aButton.activate === 'reset') {
       aButton.y -= 5;
+      aButton.h += 5;
+      aButton.activate = false;
+    }
+  }
+
+  function pressButtonD(aButton) {
+    if (aButton.activate === true) {
+      aButton.h -= 5;
+      aButton.activate = 'wait';
+      aButton.timer = 0;
+    } else if (aButton.activate === 'count') {
+      aButton.timer++;
+      if (aButton.timer > 30) {
+        aButton.activate = 'reset';
+      }
+    }
+    if (aButton.activate === 'reset') {
       aButton.h += 5;
       aButton.activate = false;
     }
@@ -373,7 +472,7 @@ function loop() {
     }
   }
 
-  if (eIsPressed && laser.shoot === 'ready') {
+  if (eIsPressed && laser.shoot === 'ready' && mirror1.rotation != 'changing' && mirror2.rotation != 'changing' && mirror3.rotation != 'changing' && mirror4.rotation != 'changing') {
     laser.shoot = 'animate';
     char.gravity = 0;
   }
@@ -420,6 +519,14 @@ function loop() {
       wallCollide(entrance);
       wallCollide(button1L);
       wallCollide(button1R);
+      wallCollide(button1U);
+      wallCollide(button2U);
+      wallCollide(button1D);
+      wallCollide(button1L.base);
+      wallCollide(button1R.base);
+      wallCollide(button1U.base);
+      wallCollide(button2U.base);
+      wallCollide(button1D.base);
 
       if (laser.xLine < -1 || laser.xLine > cnv.width + 1 || laser.yLine < 0 || laser.yLine > 473) {
         laser.collide = true;
@@ -522,7 +629,6 @@ function loop() {
           laser.dy = 1;
         }
       }
-
       checkMirrors = 'ready'
       mirror1.coords = '';
       mirror2.coords = '';
@@ -532,7 +638,7 @@ function loop() {
   }
 
   function wallCollide(aWall) {
-    if (laser.xLine >= aWall.x && laser.xLine <= aWall.x + aWall.w && laser.yLine > aWall.y && laser.yLine < aWall.y + aWall.h) {
+    if (laser.xLine >= aWall.x && laser.xLine <= aWall.x + aWall.w && laser.yLine >= aWall.y && laser.yLine <= aWall.y + aWall.h) {
       laser.collide = true;
       laser.xLine;
       if (aWall.action === 'hole') {
@@ -570,19 +676,33 @@ function loop() {
   drawMirror(mirror4);
 
   function drawMirror(aMirror) {
+    ctx.fillStyle = 'lightblue';
     ctx.beginPath();
-    ctx.moveTo(aMirror.x1, aMirror.y1);
-    ctx.lineTo(aMirror.cor1x, aMirror.cor1y);
-    ctx.lineTo(aMirror.cor2x, aMirror.cor2y);
+    ctx.lineTo(aMirror.x1, aMirror.y1);
     ctx.lineTo(aMirror.x2, aMirror.y2);
+    ctx.lineTo(aMirror.cor2x, aMirror.cor2y);
+    ctx.lineTo(aMirror.cor1x, aMirror.cor1y);
     ctx.closePath();
+    ctx.fill();
     ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(aMirror.centerX, aMirror.centerY, 3, 0, 2 * Math.PI);
+    ctx.fillStyle = '#2596be';
+    ctx.fill();
   }
 
   // CHARACTER
-  ctx.drawImage(document.getElementById('spritesheet'), char.imgX, char.imgY, 54, 56, char.x - 23, char.y - 2, 70, 72);
+  ctx.drawImage(document.getElementById('spritesheet'), char.imgX, char.imgY, 53.5, 56, char.x - 23, char.y - 1, 70, 72);
 
-  if (laser.shoot != true) {
+  if (laser.shoot != true && !showInfo) {
+
+    // Reset mirror coords
+    mirror1.coords = '';
+    mirror2.coords = '';
+    mirror3.coords = '';
+    mirror4.coords = '';
+    checkMirrors = 'ready';
+    
     // Animations
     if (rightIsPressed) {
       char.imgY = 0;
@@ -652,6 +772,7 @@ function loop() {
           level3Setup();
           level4Setup();
           level5Setup();
+          level6Setup();
         } else if (aWall.action === 'dialogue') {
           aWall.activate = true;
         } else if (aWall.action === 'button') {
@@ -680,6 +801,7 @@ function loop() {
     wallCollide(showDialogue);
     wallCollide(button1U);
     wallCollide(button2U);
+    wallCollide(button1D);
     wallCollide(button1L);
     wallCollide(button1R);
 
@@ -696,7 +818,7 @@ function loop() {
       if (char.y >= hole.y + hole.h - char.h - 2) {
         char.y = hole.y + hole.h - char.h;
       }
-    } else if (char.y > 396 && char.y != 404) {
+    } else if (char.y > 397 && char.y != 404) {
       char.y = 404;
       char.gravity = 0;
       char.standing = true;
@@ -750,6 +872,25 @@ function loop() {
     wallC2.h = hole.h;
   }
 
+  if (showInfo === true) {
+    char.imgX = 0;
+    char.imgY = 224;
+    infoCount++;
+    ctx.drawImage(infoImg, 685, 270, 300, 300)
+    char.y = 404;
+  }
+
+  if (infoCount >= 50) {
+    showInfo = false;
+    infoCount = 0;
+    char.imgX = 0;
+    char.imgY = 168;
+    char.gravity = 0;
+  }
+
+  if (screen === 'level6') {
+    ctx.drawImage(document.getElementById('win'), (cnv.width / 2) - 150, 100, 280, 200)
+  }
   requestAnimationFrame(loop);
 }
 
@@ -757,21 +898,22 @@ function level1Setup() {
   if (screen === 'level1') {
     background = document.getElementById('level1');
     hideAll();
-    entrance.x = 549;
-    entrance.y = 386;
-    entrance.w = 45.1;
-    entrance.h = 50;
+    entrance.x = 253;
+    entrance.y = 408;
+    entrance.w = 20;
+    entrance.h = 20;
     hole.x = 920;
     hole.color = '#ffeb3b';
     showDialogue.img = document.getElementById("lvl1dia");
-    showDialogue.x = 420;
+    showDialogue.x = 370;
     showDialogue.y = 400;
-    showDialogue.w = 100;
+    showDialogue.w = 200;
     showDialogue.h = 50;
     dialogueImg.x = 305;
     dialogueImg.y = 235;
     dialogueImg.w = 300;
     dialogueImg.h = 300;
+    infoImg = document.getElementById("lvl1info");
   }
 }
 
@@ -779,21 +921,22 @@ function level2Setup() {
   if (screen === 'level2') {
     background = document.getElementById('level2');
     hideAll();
-    entrance.x = 549;
-    entrance.y = 386;
-    entrance.w = 45.1;
-    entrance.h = 50;
+    entrance.x = 110;
+    entrance.y = 338;
+    entrance.w = 25;
+    entrance.h = 26;
     hole.x = 615;
     hole.color = '#8d6e63';
     showDialogue.img = document.getElementById("lvl2dia");
-    showDialogue.x = 345;
+    showDialogue.x = 295;
     showDialogue.y = 400;
-    showDialogue.w = 100;
+    showDialogue.w = 200;
     showDialogue.h = 50;
     dialogueImg.x = 238;
     dialogueImg.y = 230;
     dialogueImg.w = 300;
     dialogueImg.h = 300;
+    infoImg = document.getElementById("lvl2info");
   }
 }
 
@@ -801,21 +944,22 @@ function level3Setup() {
   if (screen === 'level3') {
     background = document.getElementById('level3');
     hideAll();
-    entrance.x = 700;
-    entrance.y = 386;
-    entrance.w = 45.1;
-    entrance.h = 50;
+    entrance.x = 573;
+    entrance.y = 330;
+    entrance.w = 40;
+    entrance.h = 38;
     hole.x = 615;
     hole.color = '#685a55';
     showDialogue.img = document.getElementById("lvl3dia");
-    showDialogue.x = 500;
+    showDialogue.x = 450;
     showDialogue.y = 400;
-    showDialogue.w = 100;
+    showDialogue.w = 200;
     showDialogue.h = 50;
     dialogueImg.x = 400;
-    dialogueImg.y = 230;
+    dialogueImg.y = 210;
     dialogueImg.w = 300;
-    dialogueImg.h = 300;
+    dialogueImg.h = 200;
+    infoImg = document.getElementById("lvl3info");
   }
 }
 
@@ -830,14 +974,15 @@ function level4Setup() {
     hole.x = 850;
     hole.color = '#9e939e';
     showDialogue.img = document.getElementById("lvl4dia");
-    showDialogue.x = 610;
+    showDialogue.x = 600;
     showDialogue.y = 400;
-    showDialogue.w = 100;
+    showDialogue.w = 200;
     showDialogue.h = 50;
-    dialogueImg.x = 570;
+    dialogueImg.x = 555;
     dialogueImg.y = 215;
     dialogueImg.w = 300;
     dialogueImg.h = 300;
+    infoImg = document.getElementById("lvl4info");
   }
 }
 
@@ -845,21 +990,32 @@ function level5Setup() {
   if (screen === 'level5') {
     background = document.getElementById('level5');
     hideAll();
-    entrance.x = 549;
-    entrance.y = 386;
-    entrance.w = 45.1;
-    entrance.h = 50;
+    entrance.x = 223;
+    entrance.y = 318;
+    entrance.w = 33;
+    entrance.h = 33;
     hole.x = 200;
     hole.color = '#5c5353';
     showDialogue.img = document.getElementById("lvl5dia");
-    showDialogue.x = 90;
+    showDialogue.x = 40;
     showDialogue.y = 400;
-    showDialogue.w = 75;
+    showDialogue.w = 200;
     showDialogue.h = 50;
     dialogueImg.x = -15;
     dialogueImg.y = 235;
     dialogueImg.w = 300;
     dialogueImg.h = 300;
+    infoImg = document.getElementById("lvl5info");
+  }
+}
+
+function level6Setup() {
+  if (screen === 'level6') {
+    background = document.getElementById('level6');
+    infoImg = document.getElementById("lvl5info");
+    char.x = 100;
+    portal.x = -100;
+    
   }
 }
 
@@ -871,6 +1027,7 @@ function puzzle1Setup() {
     mirror1.y1 = 444;
     portal.x = 900;
     portal.y = 380;
+    char.facing = 'left';
   }
 }
 
@@ -915,8 +1072,7 @@ function puzzleSetup() {
   char.y = 0 - char.h;
   hole.h = 0;
   entrance.x = -100;
-  showDialogue.x = 75;
-  showDialogue.y = 400;
+  showDialogue.x = -100;
 }
 
 function hideAll() {
@@ -924,10 +1080,20 @@ function hideAll() {
   wallL2.x = -100;
   wallC1.x = -100;
   wallC2.x = -100;
-  mirror1.x1 = -100;
+  mirror1.centerX = -100;
+  mirror2.centerX = -100;
+  mirror3.centerX = -100;
+  mirror4.centerX = -100;
+  button1U.x = -100;
+  button2U.x = -100;
+  button1D.x = -100;
+  button1L.x = -100;
+  button1R.x = -100;
   platform1.x = -100;
   platform2.x = -100;
   portal.x = -100;
+  char.facing = 'left';
+  showInfo = true;
 }
 
 // LEVEL 1: Route de la Soie
