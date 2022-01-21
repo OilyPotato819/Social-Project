@@ -1140,6 +1140,8 @@ function level6Setup() {
     infoImg = document.getElementById("lvl5info");
     char.x = 100;
     hideAll();
+    showInfo = false;
+    showDialogue.x = -1000;
   }
 }
 
