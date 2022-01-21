@@ -1362,8 +1362,8 @@ function hideAll() {
   platform2.x = -100;
   portal.x = -100;
   char.facing = 'left';
-  wallL1.x = -100;
-  wallL2.x = -100;
+  wallL1.x = -1000;
+  wallL2.x = -1000;
   showInfo = true;
 }
 
