@@ -1005,7 +1005,7 @@ function loop() {
     char.y = 404;
   }
 
-  if (infoCount >= 50) {
+  if (infoCount >= 500) {
     showInfo = false;
     infoCount = 0;
     char.imgX = 0;
