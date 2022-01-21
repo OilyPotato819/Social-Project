@@ -16,15 +16,17 @@ let leftIsPressed = false;
 let eIsPressed = false;
 let upIsPressed = false;
 let distance;
-let opacity = 0;
-let checkMirrors = 'ready';
+let factoryOpacity = 0;
+let wallOpacity1 = 10;
+let wallOpacity2 = 10;
 let showInfo = false;
 let infoCount = 0;
 let infoImg;
+let checkMirrors = false;
 let char = {
   imgX: 0,
   imgY: 0,
-  x: 850,
+  x: 100,
   y: 474 - 54,
   w: 24,
   h: 69,
@@ -64,6 +66,13 @@ function mousemoveHandler(event) {
   calculateDistance(mirror2);
   calculateDistance(mirror3);
   calculateDistance(mirror4);
+  calculateDistance(mirror5);
+  calculateDistance(mirror6);
+  calculateDistance(mirror7);
+  calculateDistance(mirror8);
+  calculateDistance(mirror9);
+  calculateDistance(mirror10);
+  calculateDistance(mirror11);
 
   function calculateDistance(aMirror) {
     let run = Math.abs(mouseX - aMirror.centerX);
@@ -89,9 +98,16 @@ function clickHandler() {
   checkIfClicked(mirror2);
   checkIfClicked(mirror3);
   checkIfClicked(mirror4);
+  checkIfClicked(mirror5);
+  checkIfClicked(mirror6);
+  checkIfClicked(mirror7);
+  checkIfClicked(mirror8);
+  checkIfClicked(mirror9);
+  checkIfClicked(mirror10);
+  checkIfClicked(mirror11);
 
   function checkIfClicked(aMirror) {
-    if (aMirror.clicked === 'click?') {
+    if (aMirror.clicked === 'click?' && laser.shoot != true) {
       aMirror.rotation = 'changing';
     }
   }
@@ -152,39 +168,44 @@ function newButton(x, y, w, h, action, activate, base, timer) {
 }
 
 // Create buttons
-let button1U = newButton(400, 454, 30, 10, 'button', false, {
+let button1U = newButton(-100, 454, 30, 10, 'button/wallL1', false, {
   x: 0,
   y: 0,
   w: 50,
-  h: 10
+  h: 10,
+  action: ''
 });
-let button2U = newButton(500, 454, 30, 10, 'button', false, {
+let button1D = newButton(-100, 300, 30, 10, 'button', false, {
   x: 0,
   y: 0,
   w: 50,
-  h: 10
+  h: 10,
+  action: ''
 });
-let button1D = newButton(470, 300, 30, 10, 'button', false, {
-  x: 0,
-  y: 0,
-  w: 50,
-  h: 10
-});
-let button1L = newButton(600, 410, 10, 30, 'button', false, {
+let button1L = newButton(-100, 410, 10, 30, 'button/portal', false, {
   x: 0,
   y: 0,
   w: 10,
-  h: 50
+  h: 50,
+  action: ''
 });
-let button1R = newButton(320, 410, 10, 30, 'button', false, {
+let button1R = newButton(-100, 410, 10, 30, 'button', false, {
   x: 0,
   y: 0,
   w: 10,
-  h: 50
+  h: 50,
+  action: ''
+});
+let button2R = newButton(-100, 410, 10, 30, 'button', false, {
+  x: 0,
+  y: 0,
+  w: 10,
+  h: 50,
+  action: ''
 });
 
 // Block function
-function newBlock(x, y, w, h, action, activate, img, color) {
+function newBlock(x, y, w, h, action, activate, img, color, hide) {
   return {
     x: x,
     y: y,
@@ -194,18 +215,19 @@ function newBlock(x, y, w, h, action, activate, img, color) {
     activate: activate,
     img: img,
     color: color,
+    hide: hide,
   }
 }
 
 // Create blocks
-let platform1 = newBlock(-100, 0, 50, 10);
-let platform2 = newBlock(-100, 0, 50, 10);
-let wallL1 = newBlock(100, 400, 10, 50);
-let wallL2 = newBlock(-100, 0, 10, 50);
-let wallC1 = newBlock(-100, 0, 0.01, 0);
-let wallC2 = newBlock(-100, 0, 0.01, 0);
+let platform1 = newBlock(-100, 0, 50, 10, '');
+let platform2 = newBlock(-100, 0, 50, 10, '');
+let wallL1 = newBlock(-100, 400, 10, 50, '');
+let wallL2 = newBlock(-100, 0, 10, 50, '');
+let wallC1 = newBlock(-100, 0, 0.01, 0, '');
+let wallC2 = newBlock(-100, 0, 0.01, 0, '');
 let entrance = newBlock(-100, 0, 45, 35, 'hole');
-let hole = newBlock(-100, 474, 100, 0);
+let hole = newBlock(-100, 474, 100, 0, '');
 let portal = newBlock(900, 380, 69, 90, 'portal');
 let showDialogue = newBlock(0, 0, 0, 0, 'dialogue', true, document.getElementById("lvl1dia"));
 let dialogueImg = newBlock(0, 0, 0, 0, 'dialogue');
@@ -232,10 +254,17 @@ function newMirror(centerX, centerY, angle, x1, y1, action, coords, rotation, x2
 }
 
 // Create mirror
-let mirror1 = newMirror(200, 420, 135, 700, 350, 'mirror', '', 135);
-let mirror2 = newMirror(300, 420, 45, 670, 420, 'mirror', '', 45);
-let mirror3 = newMirror(400, 420, 45, 750, 350, 'mirror', '', 45);
-let mirror4 = newMirror(500, 420, 135, 780, 420, 'mirror', '', 135);
+let mirror1 = newMirror(-100, 200, 135, 700, 350, 'mirror', '', 135);
+let mirror2 = newMirror(-100, 420, 45, 670, 420, 'mirror', '', 45);
+let mirror3 = newMirror(-100, 200, 45, 750, 350, 'mirror', '', 45);
+let mirror4 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
+let mirror5 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
+let mirror6 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
+let mirror7 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
+let mirror8 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
+let mirror9 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
+let mirror10 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
+let mirror11 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
@@ -249,14 +278,14 @@ function loop() {
 
   // factory interior
   if (background === document.getElementById('level4')) {
-    if (char.x < 200 && opacity < 10) {
-      opacity += 1;
-    } else if (char.x > 200 && opacity > 0) {
-      opacity -= 1;
+    if (char.x < 200 && factoryOpacity < 10) {
+      factoryOpacity += 1;
+    } else if (char.x > 200 && factoryOpacity > 0) {
+      factoryOpacity -= 1;
     }
-    ctx.globalAlpha = opacity / 10
+    ctx.globalAlpha = factoryOpacity / 10;
     ctx.drawImage(document.getElementById('factory-interior'), 0, 271, 200, 207);
-    ctx.globalAlpha = 1
+    ctx.globalAlpha = 1;
   }
 
   // Dialogue box
@@ -270,8 +299,28 @@ function loop() {
   ctx.fillRect(platform2.x, platform2.y, platform2.w, platform2.h);
 
   // Walls
+
+  // wallL1
+  if (!wallL1.hide && wallOpacity1 < 10) {
+    wallOpacity1 += 0.5;
+  } else if (wallL1.hide && wallOpacity1 > 2) {
+    wallOpacity1 -= 0.5;
+  }
+  ctx.globalAlpha = wallOpacity1 / 10;
   ctx.fillRect(wallL1.x, wallL1.y, wallL1.w, wallL1.h);
+  ctx.globalAlpha = 1;
+
+  // wallL2
+  if (!wallL2.hide && wallOpacity2 < 10) {
+    wallOpacity2 += 0.5;
+  } else if (wallL2.hide && wallOpacity2 > 2) {
+    wallOpacity2 -= 0.5;
+  }
+  ctx.globalAlpha = wallOpacity2 / 10;
   ctx.fillRect(wallL2.x, wallL2.y, wallL2.w, wallL2.h);
+  ctx.globalAlpha = 1;
+
+  // char walls
   ctx.fillStyle = hole.color;
   ctx.fillRect(wallC1.x, wallC1.y, wallC1.w, wallC1.h);
   ctx.fillRect(wallC2.x, wallC2.y, wallC2.w, wallC2.h);
@@ -287,6 +336,13 @@ function loop() {
   createMirror(mirror2);
   createMirror(mirror3);
   createMirror(mirror4);
+  createMirror(mirror5);
+  createMirror(mirror6);
+  createMirror(mirror7);
+  createMirror(mirror8);
+  createMirror(mirror9);
+  createMirror(mirror10);
+  createMirror(mirror11);
 
   function createMirror(aMirror) {
     aMirror.x1 = aMirror.centerX + (25 * Math.cos((aMirror.angle + 170) * Math.PI / 180));
@@ -303,6 +359,13 @@ function loop() {
   rotateMirror(mirror2);
   rotateMirror(mirror3);
   rotateMirror(mirror4);
+  rotateMirror(mirror5);
+  rotateMirror(mirror6);
+  rotateMirror(mirror7);
+  rotateMirror(mirror8);
+  rotateMirror(mirror9);
+  rotateMirror(mirror10);
+  rotateMirror(mirror11);
 
   function rotateMirror(aMirror) {
     if (aMirror.rotation === 'changing') {
@@ -321,10 +384,10 @@ function loop() {
 
   // Draw buttons
   drawButtonU(button1U);
-  drawButtonU(button2U);
   drawButtonD(button1D);
   drawButtonL(button1L);
   drawButtonR(button1R);
+  drawButtonR(button2R);
 
   function drawButtonU(aButton) {
     if (!aButton.activate) {
@@ -337,7 +400,7 @@ function loop() {
     ctx.fillRect(aButton.base.x, aButton.base.y, aButton.base.w, aButton.base.h);
     ctx.fillRect(aButton.base.x, aButton.base.y, aButton.base.w, aButton.base.h);
   }
-  
+
   function drawButtonD(aButton) {
     if (!aButton.activate) {
       aButton.base.x = aButton.x + (aButton.w / 2) - aButton.base.w / 2;
@@ -373,13 +436,23 @@ function loop() {
   }
 
   pressButtonU(button1U);
-  pressButtonU(button2U);
   pressButtonD(button1D);
   pressButtonL(button1L);
   pressButtonR(button1R);
+  pressButtonR(button2R);
 
   function pressButtonU(aButton) {
     if (aButton.activate === true) {
+      if (aButton.action.includes('wallL1')) {
+        wallL1.hide = true;
+      }
+      if (aButton.action.includes('wallL2')) {
+        wallL2.hide = true;
+      }
+      if (aButton.action.includes('portal')) {
+        portal.x = 900;
+        portal.y = 380;
+      }
       aButton.y += 5;
       aButton.h -= 5;
       aButton.activate = 'wait';
@@ -399,6 +472,16 @@ function loop() {
 
   function pressButtonD(aButton) {
     if (aButton.activate === true) {
+      if (aButton.action.includes('wallL1')) {
+        wallL1.hide = true;
+      }
+      if (aButton.action.includes('wallL2')) {
+        wallL2.hide = true;
+      }
+      if (aButton.action.includes('portal')) {
+        portal.x = 900;
+        portal.y = 380;
+      }
       aButton.h -= 5;
       aButton.activate = 'wait';
       aButton.timer = 0;
@@ -416,6 +499,16 @@ function loop() {
 
   function pressButtonL(aButton) {
     if (aButton.activate === true) {
+      if (aButton.action.includes('wallL1')) {
+        wallL1.hide = true;
+      }
+      if (aButton.action.includes('wallL2')) {
+        wallL2.hide = true;
+      }
+      if (aButton.action.includes('portal')) {
+        portal.x = 900;
+        portal.y = 380;
+      }
       aButton.x += 5;
       aButton.w -= 5;
       aButton.activate = 'wait';
@@ -435,6 +528,16 @@ function loop() {
 
   function pressButtonR(aButton) {
     if (aButton.activate === true) {
+      if (aButton.action.includes('wallL1')) {
+        wallL1.hide = true;
+      }
+      if (aButton.action.includes('wallL2')) {
+        wallL2.hide = true;
+      }
+      if (aButton.action.includes('portal')) {
+        portal.x = 900;
+        portal.y = 380;
+      }
       aButton.w -= 5;
       aButton.activate = 'wait';
       aButton.timer = 0;
@@ -472,7 +575,7 @@ function loop() {
     }
   }
 
-  if (eIsPressed && laser.shoot === 'ready' && mirror1.rotation != 'changing' && mirror2.rotation != 'changing' && mirror3.rotation != 'changing' && mirror4.rotation != 'changing') {
+  if (eIsPressed && laser.shoot === 'ready' && mirror1.rotation != 'changing' && mirror2.rotation != 'changing' && mirror3.rotation != 'changing' && mirror4.rotation != 'changing' && mirror5.rotation != 'changing' && mirror6.rotation != 'changing' && mirror7.rotation != 'changing' && mirror8.rotation != 'changing' && mirror9.rotation != 'changing' && mirror10.rotation != 'changing' && mirror11.rotation != 'changing') {
     laser.shoot = 'animate';
     char.gravity = 0;
   }
@@ -501,8 +604,14 @@ function loop() {
         getCoordinates(mirror2);
         getCoordinates(mirror3);
         getCoordinates(mirror4);
+        getCoordinates(mirror5);
+        getCoordinates(mirror6);
+        getCoordinates(mirror7);
+        getCoordinates(mirror8);
+        getCoordinates(mirror9);
+        getCoordinates(mirror10);
+        getCoordinates(mirror11);
       }
-
       laser.xMove = laser.xLine;
       laser.xLine += laser.dx;
       laser.yMove = laser.yLine;
@@ -513,19 +622,26 @@ function loop() {
       mirrorCollision(mirror2);
       mirrorCollision(mirror3);
       mirrorCollision(mirror4);
+      mirrorCollision(mirror5);
+      mirrorCollision(mirror6);
+      mirrorCollision(mirror7);
+      mirrorCollision(mirror8);
+      mirrorCollision(mirror9);
+      mirrorCollision(mirror10);
+      mirrorCollision(mirror11);
 
       wallCollide(wallL1);
       wallCollide(wallL2);
       wallCollide(entrance);
       wallCollide(button1L);
       wallCollide(button1R);
+      wallCollide(button2R);
       wallCollide(button1U);
-      wallCollide(button2U);
       wallCollide(button1D);
       wallCollide(button1L.base);
       wallCollide(button1R.base);
+      wallCollide(button2R.base);
       wallCollide(button1U.base);
-      wallCollide(button2U.base);
       wallCollide(button1D.base);
 
       if (laser.xLine < -1 || laser.xLine > cnv.width + 1 || laser.yLine < 0 || laser.yLine > 473) {
@@ -629,23 +745,34 @@ function loop() {
           laser.dy = 1;
         }
       }
-      checkMirrors = 'ready'
       mirror1.coords = '';
       mirror2.coords = '';
       mirror3.coords = '';
       mirror4.coords = '';
+      mirror5.coords = '';
+      mirror6.coords = '';
+      mirror7.coords = '';
+      mirror8.coords = '';
+      mirror9.coords = '';
+      mirror10.coords = '';
+      mirror11.coords = '';
+      checkMirrors = 'ready';
     }
   }
 
   function wallCollide(aWall) {
-    if (laser.xLine >= aWall.x && laser.xLine <= aWall.x + aWall.w && laser.yLine >= aWall.y && laser.yLine <= aWall.y + aWall.h) {
-      laser.collide = true;
-      laser.xLine;
-      if (aWall.action === 'hole') {
-        openHole = true;
-      } else if (aWall.action === 'button') {
-        if (aWall.activate != 'wait' && aWall.activate != 'count') {
-          aWall.activate = true;
+    if (!aWall.hide) {
+      if (laser.xLine >= aWall.x && laser.xLine <= aWall.x + aWall.w && laser.yLine >= aWall.y && laser.yLine <= aWall.y + aWall.h) {
+        laser.collide = true;
+        laser.xLine;
+        if (aWall.action === 'hole') {
+          openHole = true;
+        } else if (aWall.action.includes('button') && aWall.activate != false) {
+          aWall.activate = 'count';
+        } else if (aWall.action.includes('button')) {
+          if (aWall.activate != 'wait' && aWall.activate != 'count') {
+            aWall.activate = true;
+          }
         }
       }
     }
@@ -674,6 +801,13 @@ function loop() {
   drawMirror(mirror2);
   drawMirror(mirror3);
   drawMirror(mirror4);
+  drawMirror(mirror5);
+  drawMirror(mirror6);
+  drawMirror(mirror7);
+  drawMirror(mirror8);
+  drawMirror(mirror9);
+  drawMirror(mirror10);
+  drawMirror(mirror11);
 
   function drawMirror(aMirror) {
     ctx.fillStyle = 'lightblue';
@@ -701,8 +835,15 @@ function loop() {
     mirror2.coords = '';
     mirror3.coords = '';
     mirror4.coords = '';
+    mirror5.coords = '';
+    mirror6.coords = '';
+    mirror7.coords = '';
+    mirror8.coords = '';
+    mirror9.coords = '';
+    mirror10.coords = '';
+    mirror11.coords = '';
     checkMirrors = 'ready';
-    
+
     // Animations
     if (rightIsPressed) {
       char.imgY = 0;
@@ -775,35 +916,19 @@ function loop() {
           level6Setup();
         } else if (aWall.action === 'dialogue') {
           aWall.activate = true;
-        } else if (aWall.action === 'button') {
-          if (aWall.activate != 'wait' && aWall.activate != 'count') {
-            aWall.activate = true;
-          }
         } else if (char.facing === 'right') {
           char.x = aWall.x - char.w - 1;
         } else if (char.facing === 'left') {
           char.x = aWall.x + aWall.w;
-        } else {
-          aWall.activate = false;
-
         }
       } else {
-        if (aWall.action === 'button' && aWall.activate != false) {
-          aWall.activate = 'count';
-        } else {
-          aWall.activate = false;
-        }
+        aWall.activate = false;
       }
     }
     wallCollide(wallC1);
     wallCollide(wallC2);
     wallCollide(portal);
     wallCollide(showDialogue);
-    wallCollide(button1U);
-    wallCollide(button2U);
-    wallCollide(button1D);
-    wallCollide(button1L);
-    wallCollide(button1R);
 
     // platform
     function platformCollide(aPlatform) {
@@ -824,8 +949,8 @@ function loop() {
       char.standing = true;
     } else if (char.gravity >= 0) {
       char.standing = false;
-      platformCollide(platform1);
-      platformCollide(platform2);
+      // platformCollide(platform1);
+      // platformCollide(platform2);
     }
 
     // Gravity
@@ -1014,8 +1139,7 @@ function level6Setup() {
     background = document.getElementById('level6');
     infoImg = document.getElementById("lvl5info");
     char.x = 100;
-    portal.x = -100;
-    
+    hideAll();
   }
 }
 
@@ -1023,20 +1147,56 @@ function puzzle1Setup() {
   if (screen === 'puzzle1') {
     puzzleSetup();
     hole.x = -100;
-    mirror1.x1 = 400;
-    mirror1.y1 = 444;
-    portal.x = 900;
-    portal.y = 380;
+    mirror1.centerX = 200;
+    mirror1.centerY = 300;
+    mirror2.centerX = 200;
+    mirror2.centerY = 150;
+    mirror3.centerX = 440;
+    mirror3.centerY = 444;
+    mirror4.centerX = 440;
+    mirror4.centerY = 150;
+    mirror5.centerX = 700;
+    mirror5.centerY = 300;
+    mirror6.centerX = 700;
+    mirror6.centerY = 150;
+    mirror7.centerX = 850;
+    mirror7.centerY = 150;
+    mirror8.centerX = 850;
+    mirror8.centerY = 60;
     char.facing = 'left';
+    button1R.x = 10;
+    button1R.y = 50;
+    button1R.action = 'button/portal';
   }
 }
 
 function puzzle2Setup() {
   if (screen === 'puzzle2') {
     puzzleSetup();
+    mirror1.centerX = 440;
+    mirror1.centerY = 300;
+    mirror2.centerX = 200;
+    mirror2.centerY = 150;
+    mirror3.centerX = 200;
+    mirror3.centerY = 444;
+    mirror4.centerX = 440;
+    mirror4.centerY = 150;
+    mirror5.centerX = 650;
+    mirror5.centerY = 300;
+    mirror6.centerX = 650;
+    mirror6.centerY = 150;
+    mirror7.centerX = 850;
+    mirror7.centerY = 150;
     hole.x = -100;
-    portal.x = 900;
-    portal.y = 380;
+    wallL1.x = 800;
+    wallL1.y = 0;
+    wallL1.h = 474;
+    button1U.x = 830;
+    button1U.y = 300;
+    button1U.action = 'button/portal';
+    button1D.x = 440;
+    button1D.y = 10;
+    button1D.action = 'button/wallL1';
   }
 }
 
@@ -1044,8 +1204,37 @@ function puzzle3Setup() {
   if (screen === 'puzzle3') {
     puzzleSetup();
     hole.x = -100;
-    portal.x = 900;
-    portal.y = 380;
+    mirror1.centerX = 100;
+    mirror1.centerY = 300;
+    mirror2.centerX = 100;
+    mirror2.centerY = 100;
+    mirror3.centerX = 710;
+    mirror3.centerY = 100;
+    mirror4.centerX = 700;
+    mirror4.centerY = 400;
+    mirror5.centerX = 900;
+    mirror5.centerY = 250;
+    mirror6.centerX = 900;
+    mirror6.centerY = 400;
+    mirror7.centerX = 260;
+    mirror7.centerY = 440;
+    mirror8.centerX = 260;
+    mirror8.centerY = 250;
+    mirror9.centerX = 500;
+    mirror9.centerY = 300;
+    wallL1.x = 170;
+    wallL1.y = 0;
+    wallL1.h = 474;
+    button1D.x = 485;
+    button1D.y = 200;
+    button1D.action = 'button/portal';
+    button1L.x = cnv.width - 20;
+    button1L.y = 90;
+    button1L.action = 'button/wallL1';
+    platform1.x = 451;
+    platform1.y = 180;
+    platform1.w = 100;
+    
   }
 }
 
@@ -1053,8 +1242,38 @@ function puzzle4Setup() {
   if (screen === 'puzzle4') {
     puzzleSetup();
     hole.x = -100;
-    portal.x = 900;
-    portal.y = 380;
+    mirror1.centerX = 650;
+    mirror1.centerY = 440;
+    mirror2.centerX = 200;
+    mirror2.centerY = 150;
+    mirror3.centerX = 200;
+    mirror3.centerY = 300;
+    mirror4.centerX = 440;
+    mirror4.centerY = 50;
+    mirror5.centerX = 440;
+    mirror5.centerY = 300;
+    mirror6.centerX = 650;
+    mirror6.centerY = 150;
+    mirror7.centerX = 870;
+    mirror7.centerY = 50;
+    wallL1.x = 150;
+    wallL1.y = 0;
+    wallL1.h = 474;
+    wallL2.x = 800;
+    wallL2.y = 0;
+    wallL2.h = 474;
+    button1U.x = 850;
+    button1U.y = 300;
+    button1U.action = 'button/portal';
+    button1R.x = 250;
+    button1R.y = 40;
+    button1R.action = 'button/wallL1';
+    button2R.x = 80;
+    button2R.y = 280;
+    button2R.action = 'button/wallL2';
+    platform1.x = 820;
+    platform1.y = 320;
+    platform1.w = 90;
   }
 }
 
@@ -1062,8 +1281,45 @@ function puzzle5Setup() {
   if (screen === 'puzzle5') {
     puzzleSetup();
     hole.x = -100;
-    portal.x = 900;
-    portal.y = 380;
+    mirror1.centerX = 700;
+    mirror1.centerY = 300;
+    mirror2.centerX = 400;
+    mirror2.centerY = 100;
+    mirror3.centerX = 570;
+    mirror3.centerY = 200;
+    mirror4.centerX = 570;
+    mirror4.centerY = 300;
+    mirror5.centerX = 850;
+    mirror5.centerY = 50;
+    mirror6.centerX = 850;
+    mirror6.centerY = 250;
+    mirror7.centerX = 250;
+    mirror7.centerY = 440;
+    mirror8.centerX = 250;
+    mirror8.centerY = 200;
+    mirror9.centerX = 400;
+    mirror9.centerY = 250;
+    mirror10.centerX = 570;
+    mirror10.centerY = 50;
+    mirror11.centerX = 950;
+    mirror11.centerY = 120;
+    wallL1.x = 800;
+    wallL1.y = 0;
+    wallL1.h = 474;
+    wallL1.w = 10;
+    wallL2.x = 0;
+    wallL2.y = 130;
+    wallL2.w = cnv.width;
+    wallL2.h = 10;
+    button1U.x = 920;
+    button1U.y = 300;
+    button1U.action = 'button/portal';
+    button1D.x = 680;
+    button1D.y = 200;
+    button1D.action = 'button/wallL2';
+    button1R.x = 100;
+    button1R.y = 30;
+    button1R.action = 'button/wallL1';
   }
 }
 
@@ -1073,6 +1329,12 @@ function puzzleSetup() {
   hole.h = 0;
   entrance.x = -100;
   showDialogue.x = -100;
+  portal.x = -100;
+  wallL1.hide = false;
+  wallL2.hide = false;
+  wallOpacity1 = 10;
+  wallOpacity2 = 10;
+  showInfo = false;
 }
 
 function hideAll() {
@@ -1084,15 +1346,24 @@ function hideAll() {
   mirror2.centerX = -100;
   mirror3.centerX = -100;
   mirror4.centerX = -100;
+  mirror5.centerX = -100;
+  mirror6.centerX = -100;
+  mirror7.centerX = -100;
+  mirror8.centerX = -100;
+  mirror9.centerX = -100;
+  mirror10.centerX = -100;
+  mirror11.centerX = -100;
   button1U.x = -100;
-  button2U.x = -100;
   button1D.x = -100;
   button1L.x = -100;
   button1R.x = -100;
+  button2R.x = -100;
   platform1.x = -100;
   platform2.x = -100;
   portal.x = -100;
   char.facing = 'left';
+  wallL1.x = -100;
+  wallL2.x = -100;
   showInfo = true;
 }
 
