@@ -22,7 +22,9 @@ let wallOpacity2 = 10;
 let showInfo = false;
 let infoCount = 0;
 let infoImg;
-let checkMirrors = false;
+let getCoords = false;
+let coords1, coords2, coords3, coords4, allCoords
+let mouseX, mouseY
 let char = {
   imgX: 0,
   imgY: 0,
@@ -60,8 +62,8 @@ document.addEventListener("click", clickHandler);
 function mousemoveHandler(event) {
   let pointerCheck = 0;
   let cnvRect = cnv.getBoundingClientRect();
-  var mouseX = event.x - cnvRect.x;
-  var mouseY = event.y - cnvRect.y;
+  mouseX = event.x - cnvRect.x;
+  mouseY = event.y - cnvRect.y;
   calculateDistance(mirror1);
   calculateDistance(mirror2);
   calculateDistance(mirror3);
@@ -94,6 +96,7 @@ function mousemoveHandler(event) {
 }
 
 function clickHandler() {
+  console.log(mouseX, mouseY)
   checkIfClicked(mirror1);
   checkIfClicked(mirror2);
   checkIfClicked(mirror3);
@@ -233,7 +236,7 @@ let showDialogue = newBlock(0, 0, 0, 0, 'dialogue', true, document.getElementByI
 let dialogueImg = newBlock(0, 0, 0, 0, 'dialogue');
 
 // Mirror function
-function newMirror(centerX, centerY, angle, x1, y1, action, coords, rotation, x2, y2, cor1x, cor1y, cor2x, cor2y, clicked) {
+function newMirror(centerX, centerY, angle, x1, y1, action, rotation, x2, y2, cor1x, cor1y, cor2x, cor2y, clicked) {
   return {
     centerX: centerX,
     centerY: centerY,
@@ -241,7 +244,6 @@ function newMirror(centerX, centerY, angle, x1, y1, action, coords, rotation, x2
     x1: x1,
     y1: y1,
     action: action,
-    coords: coords,
     rotation: rotation,
     x2: x2,
     y2: y2,
@@ -254,17 +256,17 @@ function newMirror(centerX, centerY, angle, x1, y1, action, coords, rotation, x2
 }
 
 // Create mirror
-let mirror1 = newMirror(-100, 200, 135, 700, 350, 'mirror', '', 135);
-let mirror2 = newMirror(-100, 420, 45, 670, 420, 'mirror', '', 45);
-let mirror3 = newMirror(-100, 200, 45, 750, 350, 'mirror', '', 45);
-let mirror4 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
-let mirror5 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
-let mirror6 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
-let mirror7 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
-let mirror8 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
-let mirror9 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
-let mirror10 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
-let mirror11 = newMirror(-100, 420, 135, 780, 420, 'mirror', '', 135);
+let mirror1 = newMirror(-100, 200, 135, 700, 350, 'mirror', 135);
+let mirror2 = newMirror(-100, 420, 45, 670, 420, 'mirror', 45);
+let mirror3 = newMirror(-100, 200, 45, 750, 350, 'mirror', 45);
+let mirror4 = newMirror(-100, 420, 135, 780, 420, 'mirror', 135);
+let mirror5 = newMirror(-100, 420, 135, 780, 420, 'mirror', 135);
+let mirror6 = newMirror(-100, 420, 135, 780, 420, 'mirror', 135);
+let mirror7 = newMirror(-100, 420, 135, 780, 420, 'mirror', 135);
+let mirror8 = newMirror(-100, 420, 135, 780, 420, 'mirror', 135);
+let mirror9 = newMirror(-100, 420, 135, 780, 420, 'mirror', 135);
+let mirror10 = newMirror(-100, 420, 135, 780, 420, 'mirror', 135);
+let mirror11 = newMirror(-100, 420, 135, 780, 420, 'mirror', 135);
 
 // MAIN PROGRAM LOOP
 requestAnimationFrame(loop);
@@ -599,7 +601,7 @@ function loop() {
     }
 
     while (!laser.collide) {
-      if (checkMirrors === 'ready') {
+      if (getCoords === 'ready') {
         getCoordinates(mirror1);
         getCoordinates(mirror2);
         getCoordinates(mirror3);
@@ -611,24 +613,18 @@ function loop() {
         getCoordinates(mirror9);
         getCoordinates(mirror10);
         getCoordinates(mirror11);
+        getCoords = 'wait';
+        allCoords = coords1 + coords2 + coords3 + coords4;
+        console.log(allCoords)
       }
+
       laser.xMove = laser.xLine;
       laser.xLine += laser.dx;
       laser.yMove = laser.yLine;
       laser.yLine += laser.dy;
 
       // Check collision
-      mirrorCollision(mirror1);
-      mirrorCollision(mirror2);
-      mirrorCollision(mirror3);
-      mirrorCollision(mirror4);
-      mirrorCollision(mirror5);
-      mirrorCollision(mirror6);
-      mirrorCollision(mirror7);
-      mirrorCollision(mirror8);
-      mirrorCollision(mirror9);
-      mirrorCollision(mirror10);
-      mirrorCollision(mirror11);
+      mirrorCollision();
 
       wallCollide(wallL1);
       wallCollide(wallL2);
@@ -659,60 +655,56 @@ function loop() {
   }
 
   function getCoordinates(aMirror) {
-    checkMirrors = true;
-    aMirror.coords += '///coords1///'
     if (aMirror.rotation === 135) {
       for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
-        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        coords1 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX--;
       }
-      aMirror.coords += '///coords2///'
+      coords1 += '//'
       for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.y2; checkY++) {
-        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        coords2 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX++;
       }
-      aMirror.coords += '///coords3///'
+      coords2 += '//'
       for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.cor2y; checkY++) {
-        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        coords3 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX--;
       }
-      aMirror.coords += '///coords4///'
+      coords3 += '//'
       for (let checkY = aMirror.cor1y, checkX = aMirror.cor1x; checkY < aMirror.cor2y; checkY++) {
-        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        coords4 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX++;
       }
+      coords4 += '//'
     } else if (aMirror.rotation === 45) {
       for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.y1; checkY++) {
-        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        coords1 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX--;
       }
-      aMirror.coords += '///coords2///'
       for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.cor2y; checkY++) {
-        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        coords2 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX++;
       }
-      aMirror.coords += '///coords3///'
       for (let checkY = aMirror.cor2y, checkX = aMirror.cor2x; checkY < aMirror.cor1y; checkY++) {
-        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        coords3 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX--;
       }
-      aMirror.coords += '///coords4///'
       for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
-        aMirror.coords += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
+        coords4 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX++;
       }
     }
   }
 
-  function mirrorCollision(aMirror) {
+  function mirrorCollision() {
     let searchFor = '|' + parseInt(laser.xLine) + ',' + parseInt(laser.yLine) + '|';
-    aMirror.coords = aMirror.coords.replace(searchFor, '|match|');
-    if (aMirror.coords.includes('match')) {
-      let coords2 = aMirror.coords.search('coords2');
-      let coords3 = aMirror.coords.search('coords3');
-      let coords4 = aMirror.coords.search('coords4');
-      let match = aMirror.coords.search('match');
-      if (match < coords2) {
+    let checkAllCoords = allCoords.replace(searchFor, '|match|');
+    if (checkAllCoords.includes('match')) {
+      let checkCoords2 = allCoords.search('coords2');
+      let checkCoords3 = allCoords.search('coords3');
+      let checkCoords4 = allCoords.search('coords4');
+      let match = allCoords.search('match');
+      if (match < checkCoords2) {
         if (laser.dx === 0) {
           laser.dx = -1;
           laser.dy = 0;
@@ -720,7 +712,7 @@ function loop() {
           laser.dx = 0;
           laser.dy = -1;
         }
-      } else if (match > coords2 && match < coords3) {
+      } else if (match > checkCoords2 && match < checkCoords3) {
         if (laser.dx === 0) {
           laser.dx = 1;
           laser.dy = 0;
@@ -728,7 +720,7 @@ function loop() {
           laser.dx = 0;
           laser.dy = -1;
         }
-      } else if (match > coords3 && match < coords4) {
+      } else if (match > checkCoords3 && match < checkCoords4) {
         if (laser.dx === 0) {
           laser.dx = 1;
           laser.dy = 0;
@@ -745,18 +737,6 @@ function loop() {
           laser.dy = 1;
         }
       }
-      mirror1.coords = '';
-      mirror2.coords = '';
-      mirror3.coords = '';
-      mirror4.coords = '';
-      mirror5.coords = '';
-      mirror6.coords = '';
-      mirror7.coords = '';
-      mirror8.coords = '';
-      mirror9.coords = '';
-      mirror10.coords = '';
-      mirror11.coords = '';
-      checkMirrors = 'ready';
     }
   }
 
@@ -817,7 +797,7 @@ function loop() {
     ctx.lineTo(aMirror.cor2x, aMirror.cor2y);
     ctx.lineTo(aMirror.cor1x, aMirror.cor1y);
     ctx.closePath();
-    ctx.fill();
+    // ctx.fill();
     ctx.stroke();
     ctx.beginPath();
     ctx.arc(aMirror.centerX, aMirror.centerY, 3, 0, 2 * Math.PI);
@@ -829,20 +809,13 @@ function loop() {
   ctx.drawImage(document.getElementById('spritesheet'), char.imgX, char.imgY, 53.5, 56, char.x - 23, char.y - 1, 70, 72);
 
   if (laser.shoot != true && !showInfo) {
-
     // Reset mirror coords
-    mirror1.coords = '';
-    mirror2.coords = '';
-    mirror3.coords = '';
-    mirror4.coords = '';
-    mirror5.coords = '';
-    mirror6.coords = '';
-    mirror7.coords = '';
-    mirror8.coords = '';
-    mirror9.coords = '';
-    mirror10.coords = '';
-    mirror11.coords = '';
-    checkMirrors = 'ready';
+    coords1 = '///coords1///';
+    coords2 = '///coords2///';
+    coords3 = '///coords3///';
+    coords4 = '///coords4///';
+    allCoords = '';
+    getCoords = 'ready';
 
     // Animations
     if (rightIsPressed) {
@@ -1005,7 +978,7 @@ function loop() {
     char.y = 404;
   }
 
-  if (infoCount >= 500) {
+  if (infoCount >= 10) {
     showInfo = false;
     infoCount = 0;
     char.imgX = 0;
@@ -1236,7 +1209,7 @@ function puzzle3Setup() {
     platform1.x = 451;
     platform1.y = 180;
     platform1.w = 100;
-    
+
   }
 }
 
