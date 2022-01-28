@@ -981,7 +981,7 @@ function loop() {
     char.y = 404;
   }
 
-  if (infoCount >= 10) {
+  if (infoCount >= 300) {
     showInfo = false;
     infoCount = 0;
     char.imgX = 0;
@@ -990,7 +990,7 @@ function loop() {
   }
 
   if (screen === 'level6') {
-    ctx.drawImage(document.getElementById('win'), (cnv.width / 2) - 150, 100, 280, 200)
+    ctx.drawImage(document.getElementById('win'), (cnv.width / 2) - (280 / 2), 100, 280, 200)
   }
   requestAnimationFrame(loop);
 }
@@ -1113,7 +1113,6 @@ function level5Setup() {
 function level6Setup() {
   if (screen === 'level6') {
     background = document.getElementById('level6');
-    infoImg = document.getElementById("lvl5info");
     char.x = 100;
     hideAll();
     showInfo = false;
