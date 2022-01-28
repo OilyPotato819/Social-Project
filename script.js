@@ -615,7 +615,6 @@ function loop() {
         getCoordinates(mirror11);
         getCoords = 'wait';
         allCoords = coords1 + coords2 + coords3 + coords4;
-        console.log(allCoords)
       }
 
       laser.xMove = laser.xLine;
@@ -681,18 +680,22 @@ function loop() {
         coords1 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX--;
       }
+      coords1 += '//'
       for (let checkY = aMirror.y2, checkX = aMirror.x2; checkY < aMirror.cor2y; checkY++) {
         coords2 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX++;
       }
+      coords2 += '//'
       for (let checkY = aMirror.cor2y, checkX = aMirror.cor2x; checkY < aMirror.cor1y; checkY++) {
         coords3 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX--;
       }
+      coords3 += '//'
       for (let checkY = aMirror.y1, checkX = aMirror.x1; checkY < aMirror.cor1y; checkY++) {
         coords4 += '|' + parseInt(checkX) + ',' + parseInt(checkY) + '|';
         checkX++;
       }
+      coords4 += '//'
     }
   }
 
@@ -703,7 +706,7 @@ function loop() {
       let checkCoords2 = allCoords.search('coords2');
       let checkCoords3 = allCoords.search('coords3');
       let checkCoords4 = allCoords.search('coords4');
-      let match = allCoords.search('match');
+      let match = checkAllCoords.search('match');
       if (match < checkCoords2) {
         if (laser.dx === 0) {
           laser.dx = -1;
