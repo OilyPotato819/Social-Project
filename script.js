@@ -800,7 +800,7 @@ function loop() {
     ctx.lineTo(aMirror.cor2x, aMirror.cor2y);
     ctx.lineTo(aMirror.cor1x, aMirror.cor1y);
     ctx.closePath();
-    // ctx.fill();
+    ctx.fill();
     ctx.stroke();
     ctx.beginPath();
     ctx.arc(aMirror.centerX, aMirror.centerY, 3, 0, 2 * Math.PI);
